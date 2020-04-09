@@ -13,18 +13,18 @@ ASSCharacterBase::ASSCharacterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	Face = CreateMeshPart<USkeletalMeshComponent>(TEXT("Face"));
-	Hair = CreateMeshPart<USkeletalMeshComponent>(TEXT("Hair"));
-	Glove = CreateMeshPart<USkeletalMeshComponent>(TEXT("Glove"));
-	Shoe = CreateMeshPart<USkeletalMeshComponent>(TEXT("Shoe"));
-	Shoulder = CreateMeshPart<USkeletalMeshComponent>(TEXT("Shoulder"));
-	Helm = CreateMeshPart<USkeletalMeshComponent>(TEXT("Helm"));
-	Belt = CreateMeshPart<USkeletalMeshComponent>(TEXT("Belt"));
+	Face = CreateMeshPart<USkeletalMeshComponent>("Face");
+	Hair = CreateMeshPart<USkeletalMeshComponent>("Hair");
+	Glove = CreateMeshPart<USkeletalMeshComponent>("Glove");
+	Shoe = CreateMeshPart<USkeletalMeshComponent>("Shoe");
+	Shoulder = CreateMeshPart<USkeletalMeshComponent>("Shoulder");
+	Helm = CreateMeshPart<USkeletalMeshComponent>("Helm");
+	Belt = CreateMeshPart<USkeletalMeshComponent>("Belt");
 
-	Shield = CreateMeshPart<UStaticMeshComponent>(TEXT("Shield"), "hand_l");
-	LeftWeapon = CreateMeshPart<UStaticMeshComponent>(TEXT("LeftWeapon"), "hand_lSocket");
-	RightWeapon = CreateMeshPart<UStaticMeshComponent>(TEXT("RightWeapon"), "hand_rSocket");
-	Backpack = CreateMeshPart<UStaticMeshComponent>(TEXT("Backpack"), "Backpack");
+	Shield = CreateMeshPart<UStaticMeshComponent>("Shield", "hand_l");
+	LeftWeapon = CreateMeshPart<UStaticMeshComponent>("LeftWeapon", "hand_lSocket");
+	RightWeapon = CreateMeshPart<UStaticMeshComponent>("RightWeapon", "hand_rSocket");
+	Backpack = CreateMeshPart<UStaticMeshComponent>("Backpack", "Backpack");
 }
 
 // Called when the game starts or when spawned
@@ -41,7 +41,6 @@ void ASSCharacterBase::BeginPlay()
 	}
 
 	USkeletalMeshComponent* master = this->GetMesh();
-	CharacterMeshComponents.Add(TEXT("Cloth"), master);
 	TArray<USceneComponent*> children;
 	master->GetChildrenComponents(false, children);
 	for (int i = 0; i < children.Num(); i++)
@@ -63,6 +62,7 @@ void ASSCharacterBase::BeginPlay()
 			skeletal->SetMasterPoseComponent(master);
 		}
 	}
+	CharacterMeshComponents.Add(TEXT("Cloth"), master);
 }
 
 // Called every frame

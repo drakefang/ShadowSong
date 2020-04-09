@@ -54,11 +54,11 @@ protected:
 	virtual void BeginPlay() override;
 
 	template <class T>
-	T* CreateMeshPart(FString name, FName socket = NAME_None)
+	T* CreateMeshPart(FName name, FName socket = NAME_None)
 	{
-		auto part = CreateDefaultSubobject<T>(FName(*name));
+		auto part = CreateDefaultSubobject<T>(name);
 		part->SetupAttachment(this->GetMesh(), socket);
-		CharacterMeshComponents.Add(name, part);
+		CharacterMeshComponents.Add(name.ToString(), part);
 		return part;
 	}
 
