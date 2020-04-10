@@ -13,5 +13,8 @@ UCLASS()
 class SHADOWSONG_API ASSPlayerStateBase : public APlayerState
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ref")
+	class ASSCharacterBase* HeroRef;
 };

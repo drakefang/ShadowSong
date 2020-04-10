@@ -12,6 +12,10 @@ class SHADOWSONG_API ASSPawnBase : public APawn
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class ASSPlayerControllerBase* PlayerControllerRef;
+
+public:
 	// Sets default values for this pawn's properties
 	ASSPawnBase();
 
