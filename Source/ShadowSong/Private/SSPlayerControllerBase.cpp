@@ -203,6 +203,11 @@ bool ASSPlayerControllerBase::UpdatePlayerOnServer_Validate(FVector Click)
 
 void ASSPlayerControllerBase::MoveForwardOnServer_Implementation(float ScaleValue, float DeltaTime, float Speed)
 {
+	if (!HeroRef)
+	{
+		return;
+	}
+
 	FRotator rot = GetMoveRotator();
 	FVector delta = UKismetMathLibrary::GetForwardVector(rot);
 	delta = delta * Speed * DeltaTime;
@@ -220,6 +225,11 @@ bool ASSPlayerControllerBase::MoveForwardOnServer_Validate(float ScaleValue, flo
 
 void ASSPlayerControllerBase::MoveRightOnServer_Implementation(float ScaleValue, float DeltaTime, float Speed)
 {
+	if (!HeroRef)
+	{
+		return;
+	}
+
 	FRotator rot = GetMoveRotator();
 	FVector delta = UKismetMathLibrary::GetRightVector(rot);
 	delta = delta * Speed * DeltaTime;
