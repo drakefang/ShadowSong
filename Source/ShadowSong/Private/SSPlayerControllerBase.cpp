@@ -15,6 +15,14 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/KismetMathLibrary.h"
 
+
+ASSPlayerControllerBase::ASSPlayerControllerBase()
+{
+	LocationInterpSpeed = 10.0f;
+	RotationInterpSpeed = 5.0f;
+	EnableRotationInterp = true;
+}
+
 void ASSPlayerControllerBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -27,6 +35,13 @@ void ASSPlayerControllerBase::BeginPlay()
 	action.Linkage = 0;
 	action.UUID = USSHelper::GenerateUUID(); //TODO
 	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, action);
+}
+
+void ASSPlayerControllerBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdatePlayer(DeltaTime);
 }
 
 void ASSPlayerControllerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -63,6 +78,52 @@ FTransform ASSPlayerControllerBase::GetSpawnTransform() const
 		return Start->GetActorTransform();
 	}
 	return FTransform();
+}
+
+void ASSPlayerControllerBase::SetDestination(bool Pressed)
+{
+	if (Pressed)
+	{
+		if (OnMouseClick())
+		{
+			AActor* Click = GetWorld()->SpawnActor(ClickClass, &ClickLocation);
+			Click->SetLifeSpan(ClickLife);
+			UpdatePlayerOnServer(ClickLocation);
+		}
+	}
+}
+
+bool ASSPlayerControllerBase::OnMouseClick()
+{
+	FHitResult Result;
+	GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), true, Result);
+	if (!Result.bBlockingHit)
+	{
+		return false;
+	}
+	ClickLocation = Result.Location;
+	return true;
+}
+
+void ASSPlayerControllerBase::UpdatePlayer(float DeltaTime)
+{
+	if (!UKismetSystemLibrary::IsValid(HeroRef))
+	{
+		return;
+	}
+
+	FVector SvrLocation = HeroRef->GetActorLocation();
+	FVector ClientLocation = ClientPawnRef->GetActorLocation();
+	FVector NewLocation = UKismetMathLibrary::VInterpTo(ClientLocation, SvrLocation, DeltaTime, LocationInterpSpeed);
+	ClientPawnRef->SetActorLocation(NewLocation);
+
+	if (EnableRotationInterp)
+	{
+		FRotator SvrRot = HeroRef->GetActorRotation();
+		FRotator ClientRot = ClientPawnRef->GetActorRotation();
+		FRotator NewRot = UKismetMathLibrary::RInterpTo(ClientRot, SvrRot, DeltaTime, RotationInterpSpeed);
+		ClientPawnRef->SetActorRotation(NewRot);
+	}
 }
 
 void ASSPlayerControllerBase::InitPlayerOnServer_Implementation()
@@ -105,6 +166,25 @@ void ASSPlayerControllerBase::SpawnPlayerOnServer_Implementation()
 }
 
 bool ASSPlayerControllerBase::SpawnPlayerOnServer_Validate()
+{
+	return true;
+}
+
+void ASSPlayerControllerBase::UpdatePlayerOnServer_Implementation(FVector Click)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	FVector location = HeroRef->GetActorLocation();
+	FVector offset = Click - location;
+	if (UKismetMathLibrary::VSize(offset) >= MinClickDistance && UKismetSystemLibrary::IsValid(ServerControllerRef))
+	{
+		ServerControllerRef->MoveToLocation(Click);
+	}
+}
+
+bool ASSPlayerControllerBase::UpdatePlayerOnServer_Validate(FVector Click)
 {
 	return true;
 }

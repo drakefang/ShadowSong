@@ -14,6 +14,11 @@ class SHADOWSONG_API ASSPlayerControllerBase : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	ASSPlayerControllerBase();
+
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -33,6 +38,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ref")
 	TSubclassOf<class ASSAIControllerBase> ServerControllerClass;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Control")
+	FVector ClickLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
+	float MinClickDistance;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
+	float LocationInterpSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
+	float RotationInterpSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
+	bool EnableRotationInterp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
+	TSubclassOf<AActor> ClickClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
+	float ClickLife;
+
 protected:
 	UFUNCTION()
 	void InitPlayer();
@@ -43,4 +63,13 @@ protected:
 	void InitPlayerOnServer();
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Server")
 	void SpawnPlayerOnServer();
+	UFUNCTION(Server, Reliable, WithValidation, Category = "Server")
+	void UpdatePlayerOnServer(FVector Click);
+
+	UFUNCTION(BlueprintCallable, Category = "Client")
+	void SetDestination(bool Pressed);
+	UFUNCTION(BlueprintCallable, Category = "Client")
+	bool OnMouseClick();
+	UFUNCTION(BlueprintCallable, Category = "Client")
+	void UpdatePlayer(float DeltaTime);
 };
