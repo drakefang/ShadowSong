@@ -52,12 +52,15 @@ protected:
 	TSubclassOf<AActor> ClickClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
 	float ClickLife;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Control")
+	float RealTimeSpeed;
 
 protected:
 	UFUNCTION()
 	void InitPlayer();
 
 	FTransform GetSpawnTransform() const;
+	FRotator GetMoveRotator() const;
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Server")
 	void InitPlayerOnServer();
@@ -65,6 +68,10 @@ protected:
 	void SpawnPlayerOnServer();
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Server")
 	void UpdatePlayerOnServer(FVector Click);
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = "Server")
+	void MoveForwardOnServer(float ScaleValue, float DeltaTime, float Speed);
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation, Category = "Server")
+	void MoveRightOnServer(float ScaleValue, float DeltaTime, float Speed);
 
 	UFUNCTION(BlueprintCallable, Category = "Client")
 	void SetDestination(bool Pressed);

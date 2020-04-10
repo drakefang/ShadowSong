@@ -21,6 +21,7 @@ ASSPlayerControllerBase::ASSPlayerControllerBase()
 	LocationInterpSpeed = 10.0f;
 	RotationInterpSpeed = 5.0f;
 	EnableRotationInterp = true;
+	RealTimeSpeed = 100.0f;
 }
 
 void ASSPlayerControllerBase::BeginPlay()
@@ -80,6 +81,16 @@ FTransform ASSPlayerControllerBase::GetSpawnTransform() const
 	return FTransform();
 }
 
+FRotator ASSPlayerControllerBase::GetMoveRotator() const
+{
+	if (UKismetSystemLibrary::IsValid(HeroRef))
+	{
+		FRotator rot = HeroRef->GetActorRotation();
+		return UKismetMathLibrary::MakeRotator(0, 0, rot.Yaw);
+	}
+	return FRotator();
+}
+
 void ASSPlayerControllerBase::SetDestination(bool Pressed)
 {
 	if (Pressed)
@@ -121,7 +132,7 @@ void ASSPlayerControllerBase::UpdatePlayer(float DeltaTime)
 	{
 		FRotator SvrRot = HeroRef->GetActorRotation();
 		FRotator ClientRot = ClientPawnRef->GetActorRotation();
-		FRotator NewRot = UKismetMathLibrary::RInterpTo(ClientRot, SvrRot, DeltaTime, RotationInterpSpeed);
+		FRotator NewRot = UKismetMathLibrary::RInterpTo_Constant(ClientRot, SvrRot, DeltaTime, RotationInterpSpeed);
 		ClientPawnRef->SetActorRotation(NewRot);
 	}
 }
@@ -162,6 +173,7 @@ void ASSPlayerControllerBase::SpawnPlayerOnServer_Implementation()
 		ServerControllerRef = GetWorld()->SpawnActor<ASSAIControllerBase>(ServerControllerClass, SpawnTransform, SpwanParams);
 	}
 	ServerControllerRef->HeroRef = HeroRef;
+	ServerControllerRef->PlayerControllerRef = this;
 	ServerControllerRef->Possess(HeroRef);
 }
 
@@ -185,6 +197,36 @@ void ASSPlayerControllerBase::UpdatePlayerOnServer_Implementation(FVector Click)
 }
 
 bool ASSPlayerControllerBase::UpdatePlayerOnServer_Validate(FVector Click)
+{
+	return true;
+}
+
+void ASSPlayerControllerBase::MoveForwardOnServer_Implementation(float ScaleValue, float DeltaTime, float Speed)
+{
+	FRotator rot = GetMoveRotator();
+	FVector delta = UKismetMathLibrary::GetForwardVector(rot);
+	delta = delta * Speed * DeltaTime;
+	if (ScaleValue < 0)
+	{
+		delta = delta * 0.5f;
+	}
+	HeroRef->AddMovementInput(delta, ScaleValue);
+}
+
+bool ASSPlayerControllerBase::MoveForwardOnServer_Validate(float ScaleValue, float DeltaTime, float Speed)
+{
+	return true;
+}
+
+void ASSPlayerControllerBase::MoveRightOnServer_Implementation(float ScaleValue, float DeltaTime, float Speed)
+{
+	FRotator rot = GetMoveRotator();
+	FVector delta = UKismetMathLibrary::GetRightVector(rot);
+	delta = delta * Speed * DeltaTime;
+	HeroRef->AddMovementInput(delta, ScaleValue);
+}
+
+bool ASSPlayerControllerBase::MoveRightOnServer_Validate(float ScaleValue, float DeltaTime, float Speed)
 {
 	return true;
 }
