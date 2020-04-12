@@ -14,4 +14,5 @@ class SHADOWSONG_API USSGameInstanceBase : public UGameInstance
 {
 	GENERATED_BODY()
 	
+public:
 };

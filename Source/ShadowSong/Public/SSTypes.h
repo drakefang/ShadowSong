@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
+#include "Engine/DataTable.h"
 #include "SSTypes.generated.h"
 
 
@@ -33,4 +34,30 @@ struct FCurrentSelectPart
 	EPartType PartType	UMETA(DisplayName = "PartType");
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString MeshStr		UMETA(DisplayName = "MeshName");
+};
+
+USTRUCT(BlueprintType)
+struct FMeshPart
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UMeshComponent* Mesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FName Name;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FName Socket = "None";
+};
+
+USTRUCT(BlueprintType)
+struct FMeshPartRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName Name;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName Socket = "None";
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TAssetPtr<UStreamableRenderAsset> DefaultMesh;
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "SSTypes.h"
 #include "SSHelper.generated.h"
 
 /**
@@ -16,6 +17,8 @@ class SHADOWSONG_API USSHelper : public UBlueprintFunctionLibrary
 
 private:
 	static int32 startid;
+	static TArray<FMeshPartRow> PartConfigs;
+	static TSubclassOf<class UAnimInstance> AnimClass;
 	
 public:
 	UFUNCTION(BlueprintCallable)
@@ -23,4 +26,16 @@ public:
 	{
 		return startid++;
 	}
+
+	UFUNCTION(BlueprintCallable, Category = "GameConfig|Load Config Part Table")
+	static void LoadPartTable(TAssetPtr<UDataTable> Table);
+
+	UFUNCTION(BlueprintCallable, Category = "GameConfig|Get Config Part Table")
+	static const TArray<FMeshPartRow>& GetPartConfigs();
+
+	UFUNCTION(BlueprintCallable, Category = "GameConfig|Load AnimClass")
+	static void LoadAnimClass(TSubclassOf<class UAnimInstance> animClass);
+
+	UFUNCTION(BlueprintCallable, Category = "GameConfig|Get AnimClass")
+	static TSubclassOf<class UAnimInstance> GetAnimClass();
 };

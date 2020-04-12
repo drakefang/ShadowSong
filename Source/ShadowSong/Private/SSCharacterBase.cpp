@@ -6,25 +6,45 @@
 #include "Components/StaticMeshComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "SSHelper.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	Face = CreateMeshPart<USkeletalMeshComponent>("Face");
-	Hair = CreateMeshPart<USkeletalMeshComponent>("Hair");
-	Glove = CreateMeshPart<USkeletalMeshComponent>("Glove");
-	Shoe = CreateMeshPart<USkeletalMeshComponent>("Shoe");
-	Shoulder = CreateMeshPart<USkeletalMeshComponent>("Shoulder");
-	Helm = CreateMeshPart<USkeletalMeshComponent>("Helm");
-	Belt = CreateMeshPart<USkeletalMeshComponent>("Belt");
-
-	Shield = CreateMeshPart<UStaticMeshComponent>("Shield", "hand_l");
-	LeftWeapon = CreateMeshPart<UStaticMeshComponent>("LeftWeapon", "hand_lSocket");
-	RightWeapon = CreateMeshPart<UStaticMeshComponent>("RightWeapon", "hand_rSocket");
-	Backpack = CreateMeshPart<UStaticMeshComponent>("Backpack", "Backpack");
+	TArray<FMeshPartRow> parts = USSHelper::GetPartConfigs();
+	for (const auto& row : parts)
+	{
+		UStreamableRenderAsset* Asset = row.DefaultMesh.Get();
+		if (!row.DefaultMesh.IsValid())
+		{
+			Asset = row.DefaultMesh.LoadSynchronous();
+		}
+		if (row.Socket == "None")
+		{
+			USkeletalMeshComponent* Comp = GetMesh();
+			if (row.Name != "Cloth")
+			{
+				Comp = CreateMeshPart<USkeletalMeshComponent>(row.Name);
+				Comp->SetMasterPoseComponent(GetMesh());
+			}
+			else
+			{
+				Parts.Add(FMeshPart{Comp, row.Name, row.Socket});
+			}
+			USkeletalMesh* DefaultMesh = Cast<USkeletalMesh>(Asset);
+			Comp->SetSkeletalMesh(DefaultMesh);
+			Comp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+			Comp->SetAnimClass(USSHelper::GetAnimClass());
+		}
+		else
+		{
+			auto Comp = CreateMeshPart<UStaticMeshComponent>(row.Name, row.Socket);
+			UStaticMesh* DefaultMesh = Cast<UStaticMesh>(Asset);
+			Comp->SetStaticMesh(DefaultMesh);
+		}
+	}
 }
 
 // Called when the game starts or when spawned
@@ -39,30 +59,6 @@ void ASSCharacterBase::BeginPlay()
 		tmp++;
 		pt = (EPartType)tmp;
 	}
-
-	USkeletalMeshComponent* master = this->GetMesh();
-	TArray<USceneComponent*> children;
-	master->GetChildrenComponents(false, children);
-	for (int i = 0; i < children.Num(); i++)
-	{
-		USceneComponent* comp = children[i];
-		FString name = UKismetSystemLibrary::GetObjectName(comp);
-		UMeshComponent* mesh = Cast<UMeshComponent>(comp);
-		if (mesh)
-		{
-			CharacterMeshComponents.Add(name, mesh);
-		}
-	}
-	
-	for (auto& it : CharacterMeshComponents)
-	{
-		USkeletalMeshComponent* skeletal = Cast<USkeletalMeshComponent>(it.Value);
-		if (skeletal != nullptr)
-		{
-			skeletal->SetMasterPoseComponent(master);
-		}
-	}
-	CharacterMeshComponents.Add(TEXT("Cloth"), master);
 }
 
 // Called every frame
