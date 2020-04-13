@@ -25,6 +25,13 @@ enum class EPartType : uint8
 	PT_Backpack		UMETA(DisplayName = "Backpack"),
 };
 
+UENUM(BlueprintType)
+enum class ERotationMode : uint8
+{
+	VelocityDirection,
+	LookingDirection
+};
+
 USTRUCT(BlueprintType)
 struct FCurrentSelectPart
 {

@@ -25,6 +25,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Select")
 	TSubclassOf<class UAnimInstance> AnimClass;
 
+	FRotator LastVelocityRotation;
+	FRotator TargetRotation;
+	FRotator LastMovementInputRotation;
+	bool IsMoving;
+	bool HasMovementInput;
+	FVector Acceleration;
+	FVector PreviousVelocity;
+	float Speed;
+	float MovementInputAmount;
+	ERotationMode RotationMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Debug")
+	bool ShowDebugTrace;
+
 public:
 	// Sets default values for this character's properties
 	ASSCharacterBase();
@@ -43,6 +57,11 @@ protected:
 		return part;
 	}
 
+	void SetEssentialValues();
+	void UpdateGroundedRotation();
+	bool CanUpdateMovingRotation() const;
+	void SmoothCharacterRotation(const FRotator& Target, float TargetInterpSpeed, float ActorInterpSpeed);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -51,4 +70,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
+	void DrawRealtimeVelocityArrow(FLinearColor Color = FLinearColor(1, 0, 1));
+	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
+	void DrawRealtimeAccelerateArrow(FLinearColor Color = FLinearColor(1, 0.5f, 0));
+	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
+	void DrawRealtimeCharacterRotArrow(FLinearColor Color = FLinearColor(0, 0.333f, 1));
 };
