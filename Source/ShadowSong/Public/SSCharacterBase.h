@@ -38,6 +38,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Debug")
 	bool ShowDebugTrace;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Look")
+	float LookRotRate = 1.25f;
 
 public:
 	// Sets default values for this character's properties
@@ -62,6 +64,19 @@ protected:
 	bool CanUpdateMovingRotation() const;
 	void SmoothCharacterRotation(const FRotator& Target, float TargetInterpSpeed, float ActorInterpSpeed);
 
+	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
+	void DrawRealtimeVelocityArrow(FLinearColor Color = FLinearColor(1, 0, 1));
+	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
+	void DrawRealtimeAccelerateArrow(FLinearColor Color = FLinearColor(1, 0.5f, 0));
+	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
+	void DrawRealtimeCharacterRotArrow(FLinearColor Color = FLinearColor(0, 0.333f, 1));
+	void DrawRealtimeControllerRotArrow(FLinearColor Color = FLinearColor(0, 1, 1));
+
+	void FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut) const;
+	void GetControlForwardRightVector(FVector& Forward, FVector& Right) const;
+
+	void LockMouseInCenter();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -71,10 +86,9 @@ public:
 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
-	void DrawRealtimeVelocityArrow(FLinearColor Color = FLinearColor(1, 0, 1));
-	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
-	void DrawRealtimeAccelerateArrow(FLinearColor Color = FLinearColor(1, 0.5f, 0));
-	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
-	void DrawRealtimeCharacterRotArrow(FLinearColor Color = FLinearColor(0, 0.333f, 1));
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Movement Input")
+	void MovementInput(bool IsForward);
+	UFUNCTION(BlueprintCallable, Category = "Camera Input")
+	void CameraControlInput(float AxisValue, bool IsPitch);
 };

@@ -9,6 +9,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Gameframework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "SSHelper.h"
 
 // Sets default values
@@ -173,6 +174,7 @@ void ASSCharacterBase::Tick(float DeltaTime)
 		DrawRealtimeVelocityArrow();
 		DrawRealtimeAccelerateArrow();
 		DrawRealtimeCharacterRotArrow();
+		DrawRealtimeControllerRotArrow();
 	}
 }
 
@@ -186,6 +188,37 @@ void ASSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 UAbilitySystemComponent* ASSCharacterBase::GetAbilitySystemComponent() const
 {
 	return nullptr;
+}
+
+void ASSCharacterBase::MovementInput(bool IsForward)
+{
+	FVector Forward, Right;
+	float XOut = 0, YOut = 0;
+	GetControlForwardRightVector(Forward, Right);
+	float YIn = GetInputAxisValue("MoveForward/Backwards");
+	float XIn = GetInputAxisValue("MoveRight/Left");
+	FixDiagonalGamePadValues(XIn, YIn, XOut, YOut);
+	if (IsForward)
+	{
+		AddMovementInput(Forward, YOut);
+	}
+	else
+	{
+		AddMovementInput(Right, XOut);
+	}
+}
+
+void ASSCharacterBase::CameraControlInput(float AxisValue, bool IsPitch)
+{
+	float v = AxisValue * LookRotRate;
+	if (IsPitch)
+	{
+		AddControllerPitchInput(v);
+	}
+	else
+	{
+		AddControllerYawInput(v);
+	}
 }
 
 void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color)
@@ -248,3 +281,46 @@ void ASSCharacterBase::DrawRealtimeCharacterRotArrow(FLinearColor Color)
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 50.0f, Color, 0, 3);
 }
 
+void ASSCharacterBase::DrawRealtimeControllerRotArrow(FLinearColor Color)
+{
+	FVector Location = GetActorLocation();
+	FVector Offset = FVector(0, 0, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	FVector LineStart = Location - Offset;
+
+	FRotator rot = GetControlRotation();
+	rot.Pitch = 0;
+	rot.Roll = 0;
+	FVector LineEnd = UKismetMathLibrary::Conv_RotatorToVector(rot);
+	LineEnd = UKismetMathLibrary::Vector_NormalUnsafe(LineEnd) * 100 + LineStart;
+	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 50.0f, Color, 0, 3);
+}
+
+void ASSCharacterBase::FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut) const
+{
+	float ax = UKismetMathLibrary::Abs(XIn);
+	float ay = UKismetMathLibrary::Abs(YIn);
+	YOut = UKismetMathLibrary::MapRangeClamped(ax, 0, 0.6f, 1.0f, 1.2f) * YIn;
+	YOut = UKismetMathLibrary::FClamp(YOut, -1, 1);
+
+	XOut = UKismetMathLibrary::MapRangeClamped(ay, 0, 0.6f, 1.0f, 1.2f) * XIn;
+	XOut = UKismetMathLibrary::FClamp(XOut, -1, 1);
+}
+
+void ASSCharacterBase::GetControlForwardRightVector(FVector& Forward, FVector& Right) const
+{
+	FRotator rot = this->GetControlRotation();
+	Forward = UKismetMathLibrary::GetForwardVector(FRotator(0, rot.Yaw, 0));
+	Right = UKismetMathLibrary::GetRightVector(FRotator(0, rot.Yaw, 0));
+}
+
+void ASSCharacterBase::LockMouseInCenter()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC || PC->bShowMouseCursor)
+	{
+		return;
+	}
+	int x = 0, y = 0;
+	PC->GetViewportSize(x, y);
+	PC->SetMouseLocation(x / 2, y / 2);
+}
