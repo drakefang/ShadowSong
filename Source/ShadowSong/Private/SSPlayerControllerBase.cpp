@@ -18,15 +18,14 @@
 
 ASSPlayerControllerBase::ASSPlayerControllerBase()
 {
-	LocationInterpSpeed = 10.0f;
-	RotationInterpSpeed = 5.0f;
-	EnableRotationInterp = true;
-	RealTimeSpeed = 100.0f;
+	
 }
 
 void ASSPlayerControllerBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	bShowMouseCursor = true;
 
 	DisableInput(this);
 
@@ -41,32 +40,21 @@ void ASSPlayerControllerBase::BeginPlay()
 void ASSPlayerControllerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	UpdatePlayer(DeltaTime);
 }
 
-void ASSPlayerControllerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ASSPlayerControllerBase, ClientPawnRef);
-	DOREPLIFETIME(ASSPlayerControllerBase, HeroRef);
-}
+//void ASSPlayerControllerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+//{
+//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//}
 
 void ASSPlayerControllerBase::InitPlayer()
 {
-	if (!IsLocalPlayerController())
-	{
-		return;
-	}
-	bShowMouseCursor = true;
-
-	InitPlayerOnServer();
-
+	APawn* P = this->GetPawn();
+	HeroRef = Cast<ASSCharacterBase>(P);
 	EnableInput(this);
 }
 
-FTransform ASSPlayerControllerBase::GetSpawnTransform() const
+FTransform ASSPlayerControllerBase::GetSpawnRandomTransform() const
 {
 	TSubclassOf<APlayerStart> ClassOfPlayerStart = APlayerStart::StaticClass();
 	TArray<AActor*> Starts;
@@ -79,164 +67,4 @@ FTransform ASSPlayerControllerBase::GetSpawnTransform() const
 		return Start->GetActorTransform();
 	}
 	return FTransform();
-}
-
-FRotator ASSPlayerControllerBase::GetMoveRotator() const
-{
-	if (UKismetSystemLibrary::IsValid(HeroRef))
-	{
-		FRotator rot = HeroRef->GetActorRotation();
-		return UKismetMathLibrary::MakeRotator(0, 0, rot.Yaw);
-	}
-	return FRotator();
-}
-
-void ASSPlayerControllerBase::SetDestination(bool Pressed)
-{
-	if (Pressed)
-	{
-		if (OnMouseClick())
-		{
-			AActor* Click = GetWorld()->SpawnActor(ClickClass, &ClickLocation);
-			Click->SetLifeSpan(ClickLife);
-			UpdatePlayerOnServer(ClickLocation);
-		}
-	}
-}
-
-bool ASSPlayerControllerBase::OnMouseClick()
-{
-	FHitResult Result;
-	GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility), true, Result);
-	if (!Result.bBlockingHit)
-	{
-		return false;
-	}
-	ClickLocation = Result.Location;
-	return true;
-}
-
-void ASSPlayerControllerBase::UpdatePlayer(float DeltaTime)
-{
-	if (!UKismetSystemLibrary::IsValid(HeroRef))
-	{
-		return;
-	}
-
-	FVector SvrLocation = HeroRef->GetActorLocation();
-	FVector ClientLocation = ClientPawnRef->GetActorLocation();
-	FVector NewLocation = UKismetMathLibrary::VInterpTo(ClientLocation, SvrLocation, DeltaTime, LocationInterpSpeed);
-	ClientPawnRef->SetActorLocation(NewLocation);
-
-	if (EnableRotationInterp)
-	{
-		FRotator SvrRot = HeroRef->GetActorRotation();
-		FRotator ClientRot = ClientPawnRef->GetActorRotation();
-		FRotator NewRot = UKismetMathLibrary::RInterpTo_Constant(ClientRot, SvrRot, DeltaTime, RotationInterpSpeed);
-		ClientPawnRef->SetActorRotation(NewRot);
-	}
-}
-
-void ASSPlayerControllerBase::InitPlayerOnServer_Implementation()
-{
-	APawn* pawn = this->GetPawn();
-	ClientPawnRef = Cast<ASSPawnBase>(pawn);
-	if (ClientPawnRef)
-	{
-		ClientPawnRef->PlayerControllerRef = this;
-		SpawnPlayerOnServer();
-	}
-}
-
-bool ASSPlayerControllerBase::InitPlayerOnServer_Validate()
-{
-	return true;
-}
-
-void ASSPlayerControllerBase::SpawnPlayerOnServer_Implementation()
-{
-	if (!this->HasAuthority())
-	{
-		return;
-	}
-	FTransform SpawnTransform = GetSpawnTransform();
-	ClientPawnRef->SetActorTransform(SpawnTransform);
-	FActorSpawnParameters SpwanParams;
-	SpwanParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	HeroRef = GetWorld()->SpawnActor<ASSCharacterBase>(HeroClass, SpawnTransform, SpwanParams);
-
-	ASSPlayerStateBase* ps = Cast<ASSPlayerStateBase>(this->PlayerState);
-	ps->HeroRef = HeroRef;
-
-	if (!UKismetSystemLibrary::IsValid(ServerControllerRef))
-	{
-		ServerControllerRef = GetWorld()->SpawnActor<ASSAIControllerBase>(ServerControllerClass, SpawnTransform, SpwanParams);
-	}
-	ServerControllerRef->HeroRef = HeroRef;
-	ServerControllerRef->PlayerControllerRef = this;
-	ServerControllerRef->Possess(HeroRef);
-}
-
-bool ASSPlayerControllerBase::SpawnPlayerOnServer_Validate()
-{
-	return true;
-}
-
-void ASSPlayerControllerBase::UpdatePlayerOnServer_Implementation(FVector Click)
-{
-	if (!HasAuthority())
-	{
-		return;
-	}
-	FVector location = HeroRef->GetActorLocation();
-	FVector offset = Click - location;
-	if (UKismetMathLibrary::VSize(offset) >= MinClickDistance && UKismetSystemLibrary::IsValid(ServerControllerRef))
-	{
-		ServerControllerRef->MoveToLocation(Click);
-	}
-}
-
-bool ASSPlayerControllerBase::UpdatePlayerOnServer_Validate(FVector Click)
-{
-	return true;
-}
-
-void ASSPlayerControllerBase::MoveForwardOnServer_Implementation(float ScaleValue, float DeltaTime, float Speed)
-{
-	if (!HeroRef)
-	{
-		return;
-	}
-
-	FRotator rot = GetMoveRotator();
-	FVector delta = UKismetMathLibrary::GetForwardVector(rot);
-	delta = delta * Speed * DeltaTime;
-	if (ScaleValue < 0)
-	{
-		delta = delta * 0.5f;
-	}
-	HeroRef->AddMovementInput(delta, ScaleValue);
-}
-
-bool ASSPlayerControllerBase::MoveForwardOnServer_Validate(float ScaleValue, float DeltaTime, float Speed)
-{
-	return true;
-}
-
-void ASSPlayerControllerBase::MoveRightOnServer_Implementation(float ScaleValue, float DeltaTime, float Speed)
-{
-	if (!HeroRef)
-	{
-		return;
-	}
-
-	FRotator rot = GetMoveRotator();
-	FVector delta = UKismetMathLibrary::GetRightVector(rot);
-	delta = delta * Speed * DeltaTime;
-	HeroRef->AddMovementInput(delta, ScaleValue);
-}
-
-bool ASSPlayerControllerBase::MoveRightOnServer_Validate(float ScaleValue, float DeltaTime, float Speed)
-{
-	return true;
 }
