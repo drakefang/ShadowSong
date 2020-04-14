@@ -3,4 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/Engine.h"
+#include "Net/UnrealNetwork.h"
 
+#include "SSTypes.h"
+
+
+SHADOWSONG_API DECLARE_LOG_CATEGORY_EXTERN(LogGame, Log, All);

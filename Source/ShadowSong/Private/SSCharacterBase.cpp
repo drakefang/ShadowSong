@@ -11,6 +11,8 @@
 #include "Gameframework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SSHelper.h"
+#include "SSAbilitySystemComponent.h"
+#include "SSAttributeSet.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase()
@@ -54,6 +56,11 @@ ASSCharacterBase::ASSCharacterBase()
 	HasMovementInput = false;
 	RotationMode = ERotationMode::LookingDirection;
 	ShowDebugTrace = false;
+
+	AbilitySystemComponent = CreateDefaultSubobject<USSAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+
+	AttributeSet = CreateDefaultSubobject<USSAttributeSet>(TEXT("AttributeSet"));
 }
 
 // Called when the game starts or when spawned
@@ -187,7 +194,7 @@ void ASSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 UAbilitySystemComponent* ASSCharacterBase::GetAbilitySystemComponent() const
 {
-	return nullptr;
+	return AbilitySystemComponent;
 }
 
 void ASSCharacterBase::MovementInput(bool IsForward)

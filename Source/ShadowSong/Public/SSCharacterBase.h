@@ -19,10 +19,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BaseParts")
 	TArray<FMeshPart> Parts;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Select")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ChangeAvatar")
 	TMap<EPartType, FString> SelectedPart;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Select")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ChangeAvatar")
 	TSubclassOf<class UAnimInstance> AnimClass;
 
 	FRotator LastVelocityRotation;
@@ -34,12 +34,20 @@ protected:
 	FVector PreviousVelocity;
 	float Speed;
 	float MovementInputAmount;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Look")
 	ERotationMode RotationMode;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Debug")
 	bool ShowDebugTrace;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Look")
 	float LookRotRate = 1.25f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Ability")
+	class USSAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY()
+	class USSAttributeSet* AttributeSet;
+	UPROPERTY()
+	uint32 bAbilitiesInitialized : 1;
 
 public:
 	// Sets default values for this character's properties
