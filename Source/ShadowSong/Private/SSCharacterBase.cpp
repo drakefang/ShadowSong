@@ -61,6 +61,7 @@ ASSCharacterBase::ASSCharacterBase()
 	AbilitySystemComponent->SetIsReplicated(true);
 
 	AttributeSet = CreateDefaultSubobject<USSAttributeSet>(TEXT("AttributeSet"));
+	bAbilitiesInitialized = 0;
 }
 
 // Called when the game starts or when spawned
