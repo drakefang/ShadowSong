@@ -19,10 +19,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BaseParts")
 	TArray<FMeshPart> Parts;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ChangeAvatar")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Change Avatar")
 	TMap<EPartType, FString> SelectedPart;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ChangeAvatar")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Change Avatar")
 	TSubclassOf<class UAnimInstance> AnimClass;
 
 	FRotator LastVelocityRotation;
@@ -99,4 +99,7 @@ protected:
 	void MovementInput(bool IsForward);
 	UFUNCTION(BlueprintCallable, Category = "Camera Input")
 	void CameraControlInput(float AxisValue, bool IsPitch);
+
+	UFUNCTION(BlueprintCallable, Category = "Change Avatar")
+	void AttachWeapon();
 };

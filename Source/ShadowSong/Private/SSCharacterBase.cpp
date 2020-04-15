@@ -19,6 +19,7 @@ ASSCharacterBase::ASSCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	Parts.Empty();
 	TArray<FMeshPartRow> parts = USSHelper::GetPartConfigs();
 	for (const auto& row : parts)
 	{
@@ -37,7 +38,7 @@ ASSCharacterBase::ASSCharacterBase()
 			}
 			else
 			{
-				Parts.Add(FMeshPart{Comp, row.Name, row.Socket});
+				Parts.Add(FMeshPart{ Comp, row.Name, row.Socket });
 			}
 			USkeletalMesh* DefaultMesh = Cast<USkeletalMesh>(Asset);
 			Comp->SetSkeletalMesh(DefaultMesh);
@@ -75,6 +76,16 @@ void ASSCharacterBase::BeginPlay()
 		uint8 tmp = (uint8)pt;
 		tmp++;
 		pt = (EPartType)tmp;
+	}
+
+	TArray<USceneComponent*> children;
+	this->GetMesh()->GetChildrenComponents(false, children);
+	for (int i = 0; i < children.Num(); i++)
+	{
+		UMeshComponent* child = Cast<UMeshComponent>(children[i]);
+		FString str;
+		child->GetName(str);
+		Parts.Add(FMeshPart{ child, *str, "None" });
 	}
 
 	LastVelocityRotation = GetActorRotation();
@@ -227,6 +238,10 @@ void ASSCharacterBase::CameraControlInput(float AxisValue, bool IsPitch)
 	{
 		AddControllerYawInput(v);
 	}
+}
+
+void ASSCharacterBase::AttachWeapon()
+{
 }
 
 void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color)
