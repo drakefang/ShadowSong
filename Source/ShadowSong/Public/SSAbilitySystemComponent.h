@@ -14,4 +14,9 @@ class SHADOWSONG_API USSAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 	
+public:
+	USSAbilitySystemComponent();
+	~USSAbilitySystemComponent();
+
+	int32 GetDefaultAbilityLevel() const;
 };

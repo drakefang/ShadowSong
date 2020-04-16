@@ -50,6 +50,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
     int32 AbilityLevel;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+    TSubclassOf<class UGameplayAbility> GrantedAbility;
+
     UFUNCTION(BlueprintCallable, Category = Item)
     FString GetIdentifierString() const;
 

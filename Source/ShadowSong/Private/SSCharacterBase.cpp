@@ -15,8 +15,12 @@
 #include "SSAttributeSet.h"
 
 // Sets default values
-ASSCharacterBase::ASSCharacterBase()
+ASSCharacterBase::ASSCharacterBase() :
+	CharacterLevel(1),
+	LookRotRate(1.25f)
 {
+	AbilitySystemComponent = CreateDefaultSubobject<USSAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Parts.Empty();
@@ -56,13 +60,10 @@ ASSCharacterBase::ASSCharacterBase()
 	IsMoving = false;
 	HasMovementInput = false;
 	RotationMode = ERotationMode::LookingDirection;
-	ShowDebugTrace = false;
-
-	AbilitySystemComponent = CreateDefaultSubobject<USSAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponent->SetIsReplicated(true);
+	bShowDebugTrace = false;
 
 	AttributeSet = CreateDefaultSubobject<USSAttributeSet>(TEXT("AttributeSet"));
-	bAbilitiesInitialized = 0;
+	bAbilitiesInitialized = false;
 }
 
 // Called when the game starts or when spawned
@@ -188,7 +189,7 @@ void ASSCharacterBase::Tick(float DeltaTime)
 
 	UpdateGroundedRotation();
 
-	if (ShowDebugTrace)
+	if (bShowDebugTrace)
 	{
 		DrawRealtimeVelocityArrow();
 		DrawRealtimeAccelerateArrow();
@@ -202,6 +203,20 @@ void ASSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ASSCharacterBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+}
+
+void ASSCharacterBase::UnPossessed()
+{
 }
 
 UAbilitySystemComponent* ASSCharacterBase::GetAbilitySystemComponent() const
@@ -242,6 +257,29 @@ void ASSCharacterBase::CameraControlInput(float AxisValue, bool IsPitch)
 
 void ASSCharacterBase::AttachWeapon()
 {
+}
+
+bool ASSCharacterBase::ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation)
+{
+	if (AbilitySystemComponent)
+	{
+		return AbilitySystemComponent->TryActivateAbilitiesByTag(AbilityTags, bAllowRemoteActivation);
+	}
+	return false;
+}
+
+int32 ASSCharacterBase::GetCharacterLevel() const
+{
+	return CharacterLevel;
+}
+
+bool ASSCharacterBase::SetCharacterLevel(int32 NewLevel)
+{
+	if (CharacterLevel != NewLevel && NewLevel > 0)
+	{
+		CharacterLevel = NewLevel;
+	}
+	return false;
 }
 
 void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color)
@@ -346,4 +384,11 @@ void ASSCharacterBase::LockMouseInCenter()
 	int x = 0, y = 0;
 	PC->GetViewportSize(x, y);
 	PC->SetMouseLocation(x / 2, y / 2);
+}
+
+void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASSCharacterBase, CharacterLevel);
 }

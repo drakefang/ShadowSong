@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-//#include "Animation/AnimInstance.h"
+#include "GameplayTagContainer.h"
 #include "AbilitySystemInterface.h"
 #include "SSTypes.h"
 #include "SSCharacterBase.generated.h"
@@ -17,14 +17,14 @@ class SHADOWSONG_API ASSCharacterBase : public ACharacter, public IAbilitySystem
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BaseParts")
-	TArray<FMeshPart> Parts;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
+	TArray<TSubclassOf<class UGameplayAbility>> GameplayAbilities;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Change Avatar")
-	TMap<EPartType, FString> SelectedPart;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
+	class USSAbilitySystemComponent* AbilitySystemComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Change Avatar")
-	TSubclassOf<class UAnimInstance> AnimClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Abilities")
+	int32 CharacterLevel;
 
 	FRotator LastVelocityRotation;
 	FRotator TargetRotation;
@@ -37,18 +37,26 @@ protected:
 	float MovementInputAmount;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Look")
 	ERotationMode RotationMode;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Debug")
-	bool ShowDebugTrace;
+	uint32 bShowDebugTrace : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Look")
-	float LookRotRate = 1.25f;
+	float LookRotRate;
 
-	UPROPERTY(VisibleAnywhere, Category = "Ability")
-	class USSAbilitySystemComponent* AbilitySystemComponent;
 	UPROPERTY()
 	class USSAttributeSet* AttributeSet;
+
 	UPROPERTY()
 	uint32 bAbilitiesInitialized : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BaseParts")
+	TArray<FMeshPart> Parts;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Change Avatar")
+	TMap<EPartType, FString> SelectedPart;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Change Avatar")
+	TSubclassOf<class UAnimInstance> AnimClass;
+
 
 public:
 	// Sets default values for this character's properties
@@ -92,6 +100,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -103,4 +113,14 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Change Avatar")
 	void AttachWeapon();
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	bool ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation = true);
+
+public:
+	UFUNCTION(BlueprintCallable)
+	int32 GetCharacterLevel() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool SetCharacterLevel(int32 NewLevel);
 };
