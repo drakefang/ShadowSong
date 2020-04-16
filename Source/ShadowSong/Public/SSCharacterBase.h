@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+//#include "Animation/AnimInstance.h"
 #include "AbilitySystemInterface.h"
 #include "SSTypes.h"
 #include "SSCharacterBase.generated.h"

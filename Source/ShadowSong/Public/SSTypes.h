@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 #include "Engine/DataTable.h"
+#include "Engine/StreamableRenderAsset.h"
 #include "SSTypes.generated.h"
 
 
