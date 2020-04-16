@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SSItemDataBase.h"
+#include "SSItemBase.h"
 #include "SSWeaponItem.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SHADOWSONG_API USSWeaponItem : public USSItemDataBase
+class SHADOWSONG_API USSWeaponItem : public USSItemBase
 {
 	GENERATED_BODY()
 	

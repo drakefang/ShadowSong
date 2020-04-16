@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Styling/SlateBrush.h"
-#include "SSItemDataBase.generated.h"
+#include "SSItemBase.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract, BlueprintType)
-class SHADOWSONG_API USSItemDataBase : public UPrimaryDataAsset
+class SHADOWSONG_API USSItemBase : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 
 public:
-    USSItemDataBase()
+    USSItemBase()
         : Price(0)
         , MaxCount(1)
         , MaxLevel(1)

@@ -69,3 +69,57 @@ struct FMeshPartRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TAssetPtr<UStreamableRenderAsset> DefaultMesh;
 };
+
+USTRUCT(BlueprintType)
+struct SHADOWSONG_API FItemData
+{
+	GENERATED_BODY()
+
+	FItemData()
+		: ItemCount(1)
+		, ItemLevel(1)
+	{
+
+	}
+
+	FItemData(int32 InItemCount, int32 InItemLevel)
+		: ItemCount(InItemCount)
+		, ItemLevel(InItemLevel)
+	{}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	int32 ItemCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	int32 ItemLevel;
+
+	bool operator==(const FItemData& Other) const
+	{
+		return ItemCount == Other.ItemCount && ItemLevel == Other.ItemLevel;
+	}
+	bool operator!=(const FItemData& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	bool IsValid() const
+	{
+		return ItemCount > 0;
+	}
+
+	void UpdateItemData(const FItemData& Other, int32 MaxCount, int32 MaxLevel)
+	{
+		if (MaxCount <= 0)
+		{
+			MaxCount = MAX_int32;
+		}
+
+		if (MaxLevel <= 0)
+		{
+			MaxLevel = MAX_int32;
+		}
+
+		ItemCount = FMath::Clamp(ItemCount + Other.ItemCount, 1, MaxCount);
+		ItemLevel = FMath::Clamp(Other.ItemLevel, 1, MaxLevel);
+	}
+};

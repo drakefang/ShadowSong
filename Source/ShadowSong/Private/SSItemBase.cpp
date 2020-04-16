@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SSItemDataBase.h"
+#include "SSItemBase.h"
 
-FString USSItemDataBase::GetIdentifierString() const
+FString USSItemBase::GetIdentifierString() const
 {
 	return GetPrimaryAssetId().ToString();
 }
 
-bool USSItemDataBase::IsConsumable() const
+bool USSItemBase::IsConsumable() const
 {
 	if (MaxCount <= 0)
 	{
@@ -17,7 +17,7 @@ bool USSItemDataBase::IsConsumable() const
 	return false;
 }
 
-FPrimaryAssetId USSItemDataBase::GetPrimaryAssetId() const
+FPrimaryAssetId USSItemBase::GetPrimaryAssetId() const
 {
 	return FPrimaryAssetId(ItemType, GetFName());
 }
