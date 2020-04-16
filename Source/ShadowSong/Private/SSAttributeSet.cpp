@@ -11,9 +11,9 @@ USSAttributeSet::USSAttributeSet()
 	, MaxHealth(1.f)
 	, Mana(0)
 	, MaxMana(0)
+	, Damage(0)
 	, AttackPower(1.f)
 	, DefensePower(1.f)
-	, Damage(0)
 {
 
 }
