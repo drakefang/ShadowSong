@@ -212,6 +212,7 @@ void ASSCharacterBase::PossessedBy(AController* NewController)
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AddStartupGameplayAbilities();
 	}
 }
 
@@ -277,7 +278,10 @@ bool ASSCharacterBase::SetCharacterLevel(int32 NewLevel)
 {
 	if (CharacterLevel != NewLevel && NewLevel > 0)
 	{
+		RemoveStartupGameplayAbilities();
 		CharacterLevel = NewLevel;
+		AddStartupGameplayAbilities();
+		return true;
 	}
 	return false;
 }
@@ -384,6 +388,48 @@ void ASSCharacterBase::LockMouseInCenter()
 	int x = 0, y = 0;
 	PC->GetViewportSize(x, y);
 	PC->SetMouseLocation(x / 2, y / 2);
+}
+
+void ASSCharacterBase::AddStartupGameplayAbilities()
+{
+	check(AbilitySystemComponent);
+
+	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
+	{
+		for (TSubclassOf<UGameplayAbility>& Ability : GameplayAbilities)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, GetCharacterLevel(), INDEX_NONE, this));
+		}
+
+		bAbilitiesInitialized = true;
+	}
+}
+
+void ASSCharacterBase::RemoveStartupGameplayAbilities()
+{
+	check(AbilitySystemComponent);
+
+	if (GetLocalRole() == ROLE_Authority && bAbilitiesInitialized)
+	{
+		TArray<FGameplayAbilitySpecHandle> AbilitiesRemove;
+		for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
+		{
+			if (Spec.SourceObject == this && GameplayAbilities.Contains(Spec.Ability->GetClass()))
+			{
+				AbilitiesRemove.Add(Spec.Handle);
+			}
+		}
+
+		for (int32 i = 0; i < AbilitiesRemove.Num(); i++)
+		{
+			AbilitySystemComponent->ClearAbility(AbilitiesRemove[i]);
+		}
+
+		FGameplayEffectQuery Query;
+		Query.EffectSource = this;
+		AbilitySystemComponent->RemoveActiveEffects(Query);
+		bAbilitiesInitialized = false;
+	}
 }
 
 void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

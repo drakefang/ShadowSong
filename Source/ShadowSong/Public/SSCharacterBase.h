@@ -94,6 +94,9 @@ protected:
 
 	void LockMouseInCenter();
 
+	void AddStartupGameplayAbilities();
+	void RemoveStartupGameplayAbilities();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
