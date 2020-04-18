@@ -87,3 +87,13 @@ void USSAttributeSet::OnRep_DefensePower()
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, DefensePower);
 }
+
+void USSAttributeSet::OnRep_Stamina()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Stamina);
+}
+
+void USSAttributeSet::OnRep_MaxStamina()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxStamina);
+}

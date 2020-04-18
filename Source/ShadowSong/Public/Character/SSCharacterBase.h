@@ -26,6 +26,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "Abilities")
 	int32 CharacterLevel;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
+	TSubclassOf<class UGameplayEffect> DefaultAttributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
+	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+
 	FRotator LastVelocityRotation;
 	FRotator TargetRotation;
 	FRotator LastMovementInputRotation;
@@ -82,21 +88,24 @@ protected:
 	void SmoothCharacterRotation(const FRotator& Target, float TargetInterpSpeed, float ActorInterpSpeed);
 
 	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
-	void DrawRealtimeVelocityArrow(FLinearColor Color = FLinearColor(1, 0, 1));
+	void DrawRealtimeVelocityArrow(FLinearColor Color = FLinearColor(1, 0, 1)) const;
 	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
-	void DrawRealtimeAccelerateArrow(FLinearColor Color = FLinearColor(1, 0.5f, 0));
+	void DrawRealtimeAccelerateArrow(FLinearColor Color = FLinearColor(1, 0.5f, 0)) const;
 	//UFUNCTION(BlueprintCallable, Category = "DebugDraw")
-	void DrawRealtimeCharacterRotArrow(FLinearColor Color = FLinearColor(0, 0.333f, 1));
-	void DrawRealtimeControllerRotArrow(FLinearColor Color = FLinearColor(0, 1, 1));
+	void DrawRealtimeCharacterRotArrow(FLinearColor Color = FLinearColor(0, 0.333f, 1)) const;
+	void DrawRealtimeControllerRotArrow(FLinearColor Color = FLinearColor(0, 1, 1)) const;
 
 	void FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut) const;
 	void GetControlForwardRightVector(FVector& Forward, FVector& Right) const;
 
-	void LockMouseInCenter();
+	void LockMouseInCenter() const;
 
-	void AddStartupGameplayAbilities();
-	void RemoveStartupGameplayAbilities();
+	virtual void AddStartupGameplayAbilities();
+	virtual void RemoveStartupGameplayAbilities();
 
+	virtual void InitializeAttributes();
+	virtual void AddStartupEffects();
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -108,6 +117,10 @@ public:
 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	virtual void SetHealth(float Health);
+	virtual void SetMana(float Mana);
+	virtual void SetStamina(float Stamina);
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Movement Input")
 	void MovementInput(bool IsForward);
@@ -118,12 +131,36 @@ protected:
 	void AttachWeapon();
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	bool ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation = true);
+	bool ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation = true) const;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	int32 GetCharacterLevel() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool SetCharacterLevel(int32 NewLevel);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetMaxHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetMana() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetMaxMana() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetStamina() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetMaxStamina() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetMoveSpeed() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetMoveSpeedBase() const;
 };

@@ -215,6 +215,12 @@ void ASSCharacterBase::PossessedBy(AController* NewController)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 		AddStartupGameplayAbilities();
+		AddStartupEffects();
+		InitializeAttributes();
+
+		SetHealth(GetMaxHealth());
+		SetMana(GetMaxMana());
+		SetStamina(GetMaxStamina());
 	}
 }
 
@@ -225,6 +231,72 @@ void ASSCharacterBase::UnPossessed()
 UAbilitySystemComponent* ASSCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ASSCharacterBase::SetHealth(float Health)
+{
+	if (AttributeSet)
+	{
+		AttributeSet->SetHealth(Health);
+	}
+}
+
+void ASSCharacterBase::SetMana(float Mana)
+{
+	if (AttributeSet)
+	{
+		AttributeSet->SetMana(Mana);
+	}
+}
+
+void ASSCharacterBase::SetStamina(float Stamina)
+{
+	if (AttributeSet)
+	{
+		AttributeSet->SetStamina(Stamina);
+	}
+}
+
+void ASSCharacterBase::InitializeAttributes()
+{
+	if (!AbilitySystemComponent)
+	{
+		return;
+	}
+
+	if (!DefaultAttributes)
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, GetCharacterLevel(), EffectContext);
+	if (NewHandle.IsValid())
+	{
+		FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+	}
+}
+
+void ASSCharacterBase::AddStartupEffects()
+{
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent || AbilitySystemComponent->StartupEffectApplied)
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	for(auto Effect : StartupEffects)
+	{
+		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, GetCharacterLevel(), EffectContext);
+		if (NewHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+		}
+	}
 }
 
 void ASSCharacterBase::MovementInput(bool IsForward)
@@ -262,7 +334,7 @@ void ASSCharacterBase::AttachWeapon()
 {
 }
 
-bool ASSCharacterBase::ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation)
+bool ASSCharacterBase::ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation) const
 {
 	if (AbilitySystemComponent)
 	{
@@ -288,7 +360,80 @@ bool ASSCharacterBase::SetCharacterLevel(int32 NewLevel)
 	return false;
 }
 
-void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color)
+float ASSCharacterBase::GetHealth() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetHealth();
+	}
+	return 0.0f;
+}
+
+float ASSCharacterBase::GetMaxHealth() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMaxHealth();
+	}
+	return 0.0f;
+}
+
+float ASSCharacterBase::GetMana() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMana();
+	}
+	return 0.0f;
+}
+
+float ASSCharacterBase::GetMaxMana() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMaxMana();
+	}
+	return 0.0f;
+}
+
+float ASSCharacterBase::GetStamina() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetStamina();
+	}
+	return 0.0f;
+}
+
+float ASSCharacterBase::GetMaxStamina() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMaxStamina();
+	}
+	return 0.0f;
+}
+
+float ASSCharacterBase::GetMoveSpeed() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMoveSpeed();
+	}
+	return 0.0f;
+}
+
+float ASSCharacterBase::GetMoveSpeedBase() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMoveSpeedAttribute().GetGameplayAttributeData(AttributeSet)->GetBaseValue();
+	}
+
+	return 0.0f;
+}
+
+void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color) const
 {
 	FVector Location = GetActorLocation();
 	FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
@@ -312,7 +457,7 @@ void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color)
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 60.0f, Color, 0, 5.0f);
 }
 
-void ASSCharacterBase::DrawRealtimeAccelerateArrow(FLinearColor Color)
+void ASSCharacterBase::DrawRealtimeAccelerateArrow(FLinearColor Color) const
 {
 	FVector Location = GetActorLocation();
 	FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 3.5f);
@@ -337,7 +482,7 @@ void ASSCharacterBase::DrawRealtimeAccelerateArrow(FLinearColor Color)
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 50.0f, Color, 0, 3);
 }
 
-void ASSCharacterBase::DrawRealtimeCharacterRotArrow(FLinearColor Color)
+void ASSCharacterBase::DrawRealtimeCharacterRotArrow(FLinearColor Color) const
 {
 	FVector Location = GetActorLocation();
 	FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 7);
@@ -348,7 +493,7 @@ void ASSCharacterBase::DrawRealtimeCharacterRotArrow(FLinearColor Color)
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 50.0f, Color, 0, 3);
 }
 
-void ASSCharacterBase::DrawRealtimeControllerRotArrow(FLinearColor Color)
+void ASSCharacterBase::DrawRealtimeControllerRotArrow(FLinearColor Color) const
 {
 	FVector Location = GetActorLocation();
 	FVector Offset = FVector(0, 0, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
@@ -380,7 +525,7 @@ void ASSCharacterBase::GetControlForwardRightVector(FVector& Forward, FVector& R
 	Right = UKismetMathLibrary::GetRightVector(FRotator(0, rot.Yaw, 0));
 }
 
-void ASSCharacterBase::LockMouseInCenter()
+void ASSCharacterBase::LockMouseInCenter() const
 {
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (!PC || PC->bShowMouseCursor)
@@ -394,17 +539,18 @@ void ASSCharacterBase::LockMouseInCenter()
 
 void ASSCharacterBase::AddStartupGameplayAbilities()
 {
-	check(AbilitySystemComponent);
-
-	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent || AbilitySystemComponent->StartupAbilitiesGiven)
 	{
-		for (TSubclassOf<UGameplayAbility>& Ability : GameplayAbilities)
-		{
-			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, GetCharacterLevel(), INDEX_NONE, this));
-		}
-
-		bAbilitiesInitialized = true;
+		return;
 	}
+
+	for (TSubclassOf<UGameplayAbility>& Ability : GameplayAbilities)
+	{
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, GetCharacterLevel(), INDEX_NONE, this));
+	}
+
+	bAbilitiesInitialized = true;
+	AbilitySystemComponent->StartupAbilitiesGiven = true;
 }
 
 void ASSCharacterBase::RemoveStartupGameplayAbilities()

@@ -18,5 +18,8 @@ public:
 	USSAbilitySystemComponent();
 	~USSAbilitySystemComponent();
 
+	bool StartupEffectApplied = false;
+	bool StartupAbilitiesGiven = false;
+
 	int32 GetDefaultAbilityLevel() const;
 };

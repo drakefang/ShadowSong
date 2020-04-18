@@ -42,6 +42,14 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(USSAttributeSet, MaxMana);
 
+	UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_Stamina)
+	FGameplayAttributeData Stamina;
+	ATTRIBUTE_ACCESSORS(USSAttributeSet, Stamina);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_MaxStamina)
+	FGameplayAttributeData MaxStamina;
+	ATTRIBUTE_ACCESSORS(USSAttributeSet, MaxStamina);
+
 	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed", ReplicatedUsing = OnRep_MoveSpeed)
 	FGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(USSAttributeSet, MoveSpeed);
@@ -79,4 +87,10 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_DefensePower();
+
+	UFUNCTION()
+	virtual void OnRep_Stamina();
+	
+	UFUNCTION()
+	virtual void OnRep_MaxStamina();
 };
