@@ -17,9 +17,18 @@ public class ShadowSong : ModuleRules
 			"GameplayAbilities", "GameplayTags", "GameplayTasks" 
 		});
 
+		PublicIncludePaths.AddRange(new string[]
+		{
+			"ShadowSong/Public/Ability",
+			"ShadowSong/Public/Actor",
+			"ShadowSong/Public/Character",
+			"ShadowSong/Public/Item",
+			"ShadowSong/Public/Player"
+		});
+
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
+
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 

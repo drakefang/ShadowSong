@@ -13,9 +13,11 @@
 #include "SSHelper.h"
 #include "SSAbilitySystemComponent.h"
 #include "SSAttributeSet.h"
+#include "SSCharacterMovementComponent.h"
 
 // Sets default values
-ASSCharacterBase::ASSCharacterBase() :
+ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName)),
 	CharacterLevel(1),
 	LookRotRate(1.25f)
 {
