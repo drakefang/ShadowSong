@@ -20,6 +20,7 @@ float USSCharacterMovementComponent::GetMaxSpeed() const
 
 	if (bRequestToStartSprinting)
 	{
+		//UE_LOG(LogTemp, Display, TEXT("===>%s(), %f<==="), *FString(__FUNCTION__), SprintSpeedMultiplier);
 		return Owner->GetMoveSpeed() * SprintSpeedMultiplier;
 	}
 
@@ -44,6 +45,7 @@ FNetworkPredictionData_Client* USSCharacterMovementComponent::GetPredictionData_
 void USSCharacterMovementComponent::StartSprinting()
 {
 	bRequestToStartSprinting = true;
+	//UE_LOG(LogTemp, Display, TEXT("===>%s()<==="), *FString(__FUNCTION__));
 }
 
 void USSCharacterMovementComponent::StopSprinting()
