@@ -344,13 +344,13 @@ bool ASSCharacterBase::ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTag
 	return false;
 }
 
-bool ASSCharacterBase::ActivateAbility(FString Name, bool bAllowRemoteActivation)
+bool ASSCharacterBase::ActivateAbility(ESSAbilityID ID, bool bAllowRemoteActivation)
 {
-	if (!AbilityHandlesMap.Contains(Name))
+	if (!AbilityHandlesMap.Contains(ID))
 	{
 		return false;
 	}
-	FGameplayAbilitySpecHandle* Handle = AbilityHandlesMap.Find(Name);
+	FGameplayAbilitySpecHandle* Handle = AbilityHandlesMap.Find(ID);
 	if (AbilitySystemComponent && Handle)
 	{
 		return AbilitySystemComponent->TryActivateAbility(*Handle, bAllowRemoteActivation);
@@ -563,8 +563,7 @@ void ASSCharacterBase::AddStartupGameplayAbilities()
 	{
 		FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(*Ability, GetCharacterLevel(), 
 			INDEX_NONE, this));
-		AbilityHandlesMap.Add(Ability.GetDefaultObject()->Name, Handle);
-		UE_LOG(LogTemp, Display, TEXT("===>%s(), %s<==="), *FString(__FUNCTION__), *Ability.GetDefaultObject()->Name);
+		AbilityHandlesMap.Add(Ability.GetDefaultObject()->AbilityID, Handle);
 	}
 
 	bAbilitiesInitialized = true;

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ShadowSong/ShadowSong.h"
 #include "GameFramework/Character.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystemInterface.h"
@@ -33,7 +34,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
 
-	TMap<FString, FGameplayAbilitySpecHandle> AbilityHandlesMap;
+	TMap<ESSAbilityID, FGameplayAbilitySpecHandle> AbilityHandlesMap;
 
 	FRotator LastVelocityRotation;
 	FRotator TargetRotation;
@@ -137,7 +138,7 @@ protected:
 	bool ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation = true) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	bool ActivateAbility(FString Name, bool bAllowRemoteActivation = true);
+	bool ActivateAbility(ESSAbilityID ID, bool bAllowRemoteActivation = true);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
