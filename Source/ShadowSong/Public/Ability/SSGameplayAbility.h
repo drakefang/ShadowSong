@@ -13,5 +13,8 @@ UCLASS()
 class SHADOWSONG_API USSGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Name")
+	FString Name;
 };

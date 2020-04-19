@@ -14,6 +14,7 @@
 #include "SSAbilitySystemComponent.h"
 #include "SSAttributeSet.h"
 #include "SSCharacterMovementComponent.h"
+#include "SSGameplayAbility.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitializer) :
@@ -343,6 +344,20 @@ bool ASSCharacterBase::ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTag
 	return false;
 }
 
+bool ASSCharacterBase::ActivateAbility(FString Name, bool bAllowRemoteActivation)
+{
+	if (!AbilityHandlesMap.Contains(Name))
+	{
+		return false;
+	}
+	FGameplayAbilitySpecHandle* Handle = AbilityHandlesMap.Find(Name);
+	if (AbilitySystemComponent && Handle)
+	{
+		return AbilitySystemComponent->TryActivateAbility(*Handle, bAllowRemoteActivation);
+	}
+	return false;
+}
+
 int32 ASSCharacterBase::GetCharacterLevel() const
 {
 	return CharacterLevel;
@@ -544,9 +559,12 @@ void ASSCharacterBase::AddStartupGameplayAbilities()
 		return;
 	}
 
-	for (TSubclassOf<UGameplayAbility>& Ability : GameplayAbilities)
+	for (TSubclassOf<USSGameplayAbility>& Ability : GameplayAbilities)
 	{
-		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, GetCharacterLevel(), INDEX_NONE, this));
+		FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(*Ability, GetCharacterLevel(), 
+			INDEX_NONE, this));
+		AbilityHandlesMap.Add(Ability.GetDefaultObject()->Name, Handle);
+		UE_LOG(LogTemp, Display, TEXT("===>%s(), %s<==="), *FString(__FUNCTION__), *Ability.GetDefaultObject()->Name);
 	}
 
 	bAbilitiesInitialized = true;

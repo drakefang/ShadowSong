@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayAbilitySpec.h"
 #include "SSTypes.h"
 #include "SSCharacterBase.generated.h"
 
@@ -18,7 +19,7 @@ class SHADOWSONG_API ASSCharacterBase : public ACharacter, public IAbilitySystem
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
-	TArray<TSubclassOf<class UGameplayAbility>> GameplayAbilities;
+	TArray<TSubclassOf<class USSGameplayAbility>> GameplayAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	class USSAbilitySystemComponent* AbilitySystemComponent;
@@ -31,6 +32,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+
+	TMap<FString, FGameplayAbilitySpecHandle> AbilityHandlesMap;
 
 	FRotator LastVelocityRotation;
 	FRotator TargetRotation;
@@ -132,6 +135,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation = true) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	bool ActivateAbility(FString Name, bool bAllowRemoteActivation = true);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
