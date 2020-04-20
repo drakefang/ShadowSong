@@ -10,11 +10,14 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Gameframework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 #include "SSHelper.h"
 #include "SSAbilitySystemComponent.h"
 #include "SSAttributeSet.h"
 #include "SSCharacterMovementComponent.h"
 #include "SSGameplayAbility.h"
+#include "SSWeaponBase.h"
+#include "SSWeaponItem.h"
 
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitializer) :
@@ -331,10 +334,6 @@ void ASSCharacterBase::CameraControlInput(float AxisValue, bool IsPitch)
 	}
 }
 
-void ASSCharacterBase::AttachWeapon()
-{
-}
-
 bool ASSCharacterBase::ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation) const
 {
 	if (AbilitySystemComponent)
@@ -446,6 +445,28 @@ float ASSCharacterBase::GetMoveSpeedBase() const
 	}
 
 	return 0.0f;
+}
+
+bool ASSCharacterBase::AttachWeapon_Validate(class USSWeaponItem* Weapon, FName socket)
+{
+	return true;
+}
+
+void ASSCharacterBase::AttachWeapon_Implementation(class USSWeaponItem* Weapon, FName SocketName)
+{
+	if (IsValid(RightHandWeapon))
+	{
+		FDetachmentTransformRules Rules(EDetachmentRule::KeepRelative,
+			EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, false);
+		RightHandWeapon->DetachFromActor(Rules);
+	}
+	else
+	{
+		RightHandWeapon = Cast<ASSWeaponBase>(GetWorld()->SpawnActor(Weapon->WeaponActor));
+	}
+	RightHandWeapon->AttachToComponent(GetMesh(), 
+		FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true),
+		SocketName);
 }
 
 void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color) const

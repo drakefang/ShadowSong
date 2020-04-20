@@ -61,12 +61,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BaseParts")
 	TArray<FMeshPart> Parts;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Change Avatar")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Avatar")
 	TMap<EPartType, FString> SelectedPart;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Change Avatar")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Avatar")
 	TSubclassOf<class UAnimInstance> AnimClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Avatar")
+	class ASSWeaponBase* RightHandWeapon;
 
 public:
 	// Sets default values for this character's properties
@@ -131,9 +133,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Camera Input")
 	void CameraControlInput(float AxisValue, bool IsPitch);
 
-	UFUNCTION(BlueprintCallable, Category = "Change Avatar")
-	void AttachWeapon();
-
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool ActivateAbilitiesWithTag(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation = true) const;
 
@@ -170,4 +169,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetMoveSpeedBase() const;
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation, Category = "Avatar")
+	void AttachWeapon(class USSWeaponItem* Weapon, FName socket = "None");
 };
