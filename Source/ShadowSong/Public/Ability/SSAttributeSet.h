@@ -66,6 +66,10 @@ public:
 	FGameplayAttributeData DefensePower;
 	ATTRIBUTE_ACCESSORS(USSAttributeSet, DefensePower);
 
+	UPROPERTY(BlueprintReadOnly, Category = "Level", ReplicatedUsing = OnRep_Level)
+	FGameplayAttributeData Level;
+	ATTRIBUTE_ACCESSORS(USSAttributeSet, Level);
+
 protected:
 	UFUNCTION()
 	virtual void OnRep_Health();
@@ -93,4 +97,7 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnRep_MaxStamina();
+
+	UFUNCTION()
+	virtual void OnRep_Level();
 };

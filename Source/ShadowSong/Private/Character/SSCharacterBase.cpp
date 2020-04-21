@@ -615,6 +615,7 @@ void ASSCharacterBase::RemoveStartupGameplayAbilities()
 		Query.EffectSource = this;
 		AbilitySystemComponent->RemoveActiveEffects(Query);
 		bAbilitiesInitialized = false;
+		AbilitySystemComponent->StartupAbilitiesGiven = false;
 	}
 }
 

@@ -14,6 +14,7 @@ USSAttributeSet::USSAttributeSet()
 	, Damage(0)
 	, AttackPower(1.f)
 	, DefensePower(1.f)
+	, Level(1)
 {
 
 }
@@ -96,4 +97,9 @@ void USSAttributeSet::OnRep_Stamina()
 void USSAttributeSet::OnRep_MaxStamina()
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxStamina);
+}
+
+void USSAttributeSet::OnRep_Level()
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Level);
 }
