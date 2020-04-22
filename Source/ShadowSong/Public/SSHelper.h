@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "SSTypes.h"
+#include "GameplayEffect.h"
 #include "SSHelper.generated.h"
 
+struct FGameplayEffectSpec;
+class ASSCharacterBase;
 /**
  * 
  */
@@ -38,4 +41,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GameConfig|Get AnimClass")
 	static TSubclassOf<class UAnimInstance> GetAnimClass();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability|Effect|Actor", Meta = (DisplayName = "GetInstigatorActor"))
+	static AActor* EffectContextGetInstigatorActor(FGameplayEffectSpec const& Spec);
 };

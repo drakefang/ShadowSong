@@ -2,6 +2,8 @@
 
 
 #include "SSHelper.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Engine/DataTable.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/StreamableRenderAsset.h"
@@ -49,4 +51,9 @@ TSubclassOf<class UAnimInstance> USSHelper::GetAnimClass()
 		AnimClass = LoadClass<UAnimInstance>(nullptr, TEXT("AnimBlueprint'/Game/Characters/ABP_Player.ABP_Player_C'"));
 	}
 	return AnimClass;
+}
+
+AActor* USSHelper::EffectContextGetInstigatorActor(FGameplayEffectSpec const& Spec)
+{
+	return UAbilitySystemBlueprintLibrary::EffectContextGetInstigatorActor(Spec.GetEffectContext());
 }
