@@ -54,12 +54,14 @@ ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitial
 			Comp->SetSkeletalMesh(DefaultMesh);
 			Comp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 			Comp->SetAnimClass(USSHelper::GetAnimClass());
+			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		else
 		{
 			auto Comp = CreateMeshPart<UStaticMeshComponent>(row.Name, row.Socket);
 			UStaticMesh* DefaultMesh = Cast<UStaticMesh>(Asset);
 			Comp->SetStaticMesh(DefaultMesh);
+			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
 

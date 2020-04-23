@@ -40,4 +40,5 @@ enum class ESSAbilityID : uint8
 	Jump				UMETA(DisplayName = "Jump"),
 	Dash				UMETA(DisplayName = "Dash"),
 	SwordShieldAttack	UMETA(DisplayName = "SwordShieldAttack"),
+	Fireball			UMETA(DisplayName = "Fireball"),
 };
