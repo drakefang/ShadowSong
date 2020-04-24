@@ -449,6 +449,22 @@ float ASSCharacterBase::GetMoveSpeedBase() const
 	return 0.0f;
 }
 
+void ASSCharacterBase::GetActiveAbilitiesWithTags(FGameplayTagContainer GameplayTagContainer,
+	TArray<USSGameplayAbility*>& ActiveAbilities) const
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->GetActiveAbilitiesWithTags(GameplayTagContainer, ActiveAbilities);
+	}
+}
+
+bool ASSCharacterBase::IsUsingAbilityiesWithTags(FGameplayTagContainer GameplayTagContainer) const
+{
+	TArray<USSGameplayAbility*> ActiveAbilities;
+	GetActiveAbilitiesWithTags(GameplayTagContainer, ActiveAbilities);
+	return ActiveAbilities.Num() > 0;
+}
+
 bool ASSCharacterBase::AttachWeapon_Validate(class USSWeaponItem* Weapon, FName socket)
 {
 	return true;

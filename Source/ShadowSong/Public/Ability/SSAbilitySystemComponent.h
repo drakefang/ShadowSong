@@ -22,4 +22,6 @@ public:
 	bool StartupAbilitiesGiven = false;
 
 	int32 GetDefaultAbilityLevel() const;
+
+	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<class USSGameplayAbility*>& ActiveAbilities) const;
 };

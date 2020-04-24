@@ -172,4 +172,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation, Category = "Avatar")
 	void AttachWeapon(class USSWeaponItem* Weapon, FName socket = "None");
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	void GetActiveAbilitiesWithTags(FGameplayTagContainer GameplayTagContainer, TArray<class USSGameplayAbility*>& ActiveAbilities) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool IsUsingAbilityiesWithTags(FGameplayTagContainer GameplayTagContainer) const;
 };
