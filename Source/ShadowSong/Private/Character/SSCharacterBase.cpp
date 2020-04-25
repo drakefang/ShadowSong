@@ -16,6 +16,8 @@
 #include "SSAttributeSet.h"
 #include "SSCharacterMovementComponent.h"
 #include "SSGameplayAbility.h"
+#include "SSPlayerControllerBase.h"
+#include "SSPlayerStateBase.h"
 #include "SSWeaponBase.h"
 #include "SSWeaponItem.h"
 
@@ -72,6 +74,8 @@ ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitial
 
 	AttributeSet = CreateDefaultSubobject<USSAttributeSet>(TEXT("AttributeSet"));
 	bAbilitiesInitialized = false;
+
+	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
 }
 
 // Called when the game starts or when spawned
@@ -111,15 +115,6 @@ void ASSCharacterBase::SetEssentialValues()
 	FVector tmp = FVector(Velocity.X, Velocity.Y, 0);
 	Speed = UKismetMathLibrary::VSize(tmp);
 	IsMoving = Speed > 1.0f;
-
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		UE_LOG(LogGame, Display, TEXT("Server speed %f, acc %s"), Speed, *Acceleration.ToCompactString());
-	}
-	else
-	{
-		UE_LOG(LogGame, Display, TEXT("Client speed %f, acc %s"), Speed, *Acceleration.ToCompactString());
-	}
 
 	if (IsMoving)
 	{
@@ -236,6 +231,7 @@ void ASSCharacterBase::PossessedBy(AController* NewController)
 		SetHealth(GetMaxHealth());
 		SetMana(GetMaxMana());
 		SetStamina(GetMaxStamina());
+		SetMoveSpeed(300.0f);
 	}
 }
 
@@ -251,6 +247,42 @@ void ASSCharacterBase::OnRep_Controller()
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->RefreshAbilityActorInfo();
+	}
+}
+
+void ASSCharacterBase::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	ASSPlayerStateBase* PS = GetPlayerState<ASSPlayerStateBase>();
+	if (PS)
+	{
+		// Init ASC Actor Info for clients. Server will init its ASC when it possesses a new Actor.
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+		// Bind player input to the AbilitySystemComponent. Also called in SetupPlayerInputComponent because of a potential race condition.
+		//BindASCInput();
+
+		// If we handle players disconnecting and rejoining in the future, we'll have to change this so that posession from rejoining doesn't reset attributes.
+		// For now assume possession = spawn/respawn.
+		InitializeAttributes();
+
+		ASSPlayerControllerBase* PC = Cast<ASSPlayerControllerBase>(GetController());
+		if (PC)
+		{
+			//PC->CreateHUD();
+		}
+
+
+		// Respawn specific things that won't affect first possession.
+
+		// Forcibly set the DeadTag count to 0
+		AbilitySystemComponent->SetTagMapCount(DeadTag, 0);
+
+		// Set Health/Mana/Stamina to their max. This is only necessary for *Respawn*.
+		SetHealth(GetMaxHealth());
+		SetMana(GetMaxMana());
+		SetStamina(GetMaxStamina());
 	}
 }
 
@@ -280,6 +312,14 @@ void ASSCharacterBase::SetStamina(float Stamina)
 	if (AttributeSet)
 	{
 		AttributeSet->SetStamina(Stamina);
+	}
+}
+
+void ASSCharacterBase::SetMoveSpeed(float MoveSpeed)
+{
+	if (AttributeSet)
+	{
+		AttributeSet->SetMoveSpeed(MoveSpeed);
 	}
 }
 
@@ -452,6 +492,24 @@ float ASSCharacterBase::GetMaxStamina() const
 
 float ASSCharacterBase::GetMoveSpeed() const
 {
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		if (AttributeSet)
+		{
+			UE_LOG(LogGame, Display, TEXT("Server speed %f"), AttributeSet->GetMoveSpeed());
+		}
+	}
+	else
+	{
+		if (AttributeSet)
+		{
+			UE_LOG(LogGame, Display, TEXT("Client speed %f"), AttributeSet->GetMoveSpeed());
+		}
+		else
+		{
+			UE_LOG(LogGame, Display, TEXT("No AttributeSet!!! Client speed 0!!!"));
+		}
+	}
 	if (AttributeSet)
 	{
 		return AttributeSet->GetMoveSpeed();

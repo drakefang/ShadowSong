@@ -69,6 +69,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Avatar")
 	class ASSWeaponBase* RightHandWeapon;
+	FGameplayTag DeadTag;
 
 public:
 	// Sets default values for this character's properties
@@ -121,12 +122,14 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
 	virtual void OnRep_Controller() override;
+	virtual void OnRep_PlayerState() override;
 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual void SetHealth(float Health);
 	virtual void SetMana(float Mana);
 	virtual void SetStamina(float Stamina);
+	virtual void SetMoveSpeed(float MoveSpeed);
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Movement Input")
