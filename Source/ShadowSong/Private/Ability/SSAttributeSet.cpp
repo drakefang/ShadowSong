@@ -52,6 +52,8 @@ void USSAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(USSAttributeSet, AttackPower);
 	DOREPLIFETIME(USSAttributeSet, DefensePower);
 	DOREPLIFETIME(USSAttributeSet, MoveSpeed);
+	DOREPLIFETIME(USSAttributeSet, Stamina);
+	DOREPLIFETIME(USSAttributeSet, MaxStamina);
 }
 
 void USSAttributeSet::OnRep_Health()
@@ -76,7 +78,7 @@ void USSAttributeSet::OnRep_MaxMana()
 
 void USSAttributeSet::OnRep_MoveSpeed()
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Health);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MoveSpeed);
 }
 
 void USSAttributeSet::OnRep_AttackPower()

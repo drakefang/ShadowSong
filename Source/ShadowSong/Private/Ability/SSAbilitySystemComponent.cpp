@@ -2,6 +2,8 @@
 
 
 #include "SSAbilitySystemComponent.h"
+
+#include "AbilitySystemGlobals.h"
 #include "SSCharacterBase.h"
 #include "SSGameplayAbility.h"
 
@@ -41,4 +43,10 @@ void USSAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagCon
 			ActiveAbilities.Add(Cast<USSGameplayAbility>(ActiveAbility));
 		}
 	}
+}
+
+USSAbilitySystemComponent* USSAbilitySystemComponent::GetAbilitySystemComponentFromActor(const AActor* Actor,
+	bool LookForComponent)
+{
+	return Cast<USSAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));
 }

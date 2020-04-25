@@ -23,5 +23,8 @@ public:
 
 	int32 GetDefaultAbilityLevel() const;
 
-	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<class USSGameplayAbility*>& ActiveAbilities) const;
+	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, 
+		TArray<class USSGameplayAbility*>& ActiveAbilities) const;
+
+	static USSAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);
 };

@@ -101,7 +101,7 @@ protected:
 	void DrawRealtimeCharacterRotArrow(FLinearColor Color = FLinearColor(0, 0.333f, 1)) const;
 	void DrawRealtimeControllerRotArrow(FLinearColor Color = FLinearColor(0, 1, 1)) const;
 
-	void FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut) const;
+	static void FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut);
 	void GetControlForwardRightVector(FVector& Forward, FVector& Right) const;
 
 	void LockMouseInCenter() const;
@@ -120,6 +120,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
+	virtual void OnRep_Controller() override;
 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 

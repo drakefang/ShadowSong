@@ -79,12 +79,12 @@ void ASSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (EPartType pt = EPartType::PT_Cloth; pt < EPartType::PT_Backpack;)
+	for (EPartType Pt = EPartType::PT_Cloth; Pt < EPartType::PT_Backpack;)
 	{
-		SelectedPart.Add(pt, TEXT("NONE"));
-		uint8 tmp = (uint8)pt;
-		tmp++;
-		pt = (EPartType)tmp;
+		SelectedPart.Add(Pt, TEXT("NONE"));
+		uint8 Tmp = static_cast<uint8>(Pt);
+		Tmp++;
+		Pt = static_cast<EPartType>(Tmp);
 	}
 
 	TArray<USceneComponent*> children;
@@ -111,6 +111,15 @@ void ASSCharacterBase::SetEssentialValues()
 	FVector tmp = FVector(Velocity.X, Velocity.Y, 0);
 	Speed = UKismetMathLibrary::VSize(tmp);
 	IsMoving = Speed > 1.0f;
+
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		UE_LOG(LogGame, Display, TEXT("Server speed %f, acc %s"), Speed, *Acceleration.ToCompactString());
+	}
+	else
+	{
+		UE_LOG(LogGame, Display, TEXT("Client speed %f, acc %s"), Speed, *Acceleration.ToCompactString());
+	}
 
 	if (IsMoving)
 	{
@@ -234,6 +243,17 @@ void ASSCharacterBase::UnPossessed()
 {
 }
 
+void ASSCharacterBase::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+
+	// Our controller changed, must update ActorInfo on AbilitySystemComponent
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->RefreshAbilityActorInfo();
+	}
+}
+
 UAbilitySystemComponent* ASSCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -281,7 +301,7 @@ void ASSCharacterBase::InitializeAttributes()
 	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, GetCharacterLevel(), EffectContext);
 	if (NewHandle.IsValid())
 	{
-		FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+		/*FActiveGameplayEffectHandle ActiveHandle = */AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
 	}
 }
 
@@ -300,7 +320,7 @@ void ASSCharacterBase::AddStartupEffects()
 		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, GetCharacterLevel(), EffectContext);
 		if (NewHandle.IsValid())
 		{
-			FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+			/*FActiveGameplayEffectHandle ActiveHandle = */AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
 		}
 	}
 }
@@ -561,7 +581,7 @@ void ASSCharacterBase::DrawRealtimeControllerRotArrow(FLinearColor Color) const
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 50.0f, Color, 0, 3);
 }
 
-void ASSCharacterBase::FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut) const
+void ASSCharacterBase::FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut)
 {
 	float ax = UKismetMathLibrary::Abs(XIn);
 	float ay = UKismetMathLibrary::Abs(YIn);
