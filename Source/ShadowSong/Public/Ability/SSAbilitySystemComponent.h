@@ -26,5 +26,11 @@ public:
 	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, 
 		TArray<class USSGameplayAbility*>& ActiveAbilities) const;
 
+	//UFUNCTION()
+	virtual void OnRep_ActivateAbilities() override;
+
+	UFUNCTION(Client, Reliable)
+	void ClientSaveActivateAbilityHandles();
+
 	static USSAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);
 };

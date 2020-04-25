@@ -131,6 +131,8 @@ public:
 	virtual void SetStamina(float Stamina);
 	virtual void SetMoveSpeed(float MoveSpeed);
 
+	void SaveActivateAbilityHandles(const FGameplayAbilitySpec& Spec);
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Movement Input")
 	void MovementInput(bool IsForward);

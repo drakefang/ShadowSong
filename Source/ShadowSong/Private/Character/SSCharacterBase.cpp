@@ -231,7 +231,6 @@ void ASSCharacterBase::PossessedBy(AController* NewController)
 		SetHealth(GetMaxHealth());
 		SetMana(GetMaxMana());
 		SetStamina(GetMaxStamina());
-		SetMoveSpeed(300.0f);
 	}
 }
 
@@ -265,7 +264,13 @@ void ASSCharacterBase::OnRep_PlayerState()
 
 		// If we handle players disconnecting and rejoining in the future, we'll have to change this so that posession from rejoining doesn't reset attributes.
 		// For now assume possession = spawn/respawn.
+		AddStartupGameplayAbilities();
+		AddStartupEffects();
 		InitializeAttributes();
+
+		SetHealth(GetMaxHealth());
+		SetMana(GetMaxMana());
+		SetStamina(GetMaxStamina());
 
 		ASSPlayerControllerBase* PC = Cast<ASSPlayerControllerBase>(GetController());
 		if (PC)
@@ -321,6 +326,17 @@ void ASSCharacterBase::SetMoveSpeed(float MoveSpeed)
 	{
 		AttributeSet->SetMoveSpeed(MoveSpeed);
 	}
+}
+
+void ASSCharacterBase::SaveActivateAbilityHandles(const FGameplayAbilitySpec& Spec)
+{
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
+
+	USSGameplayAbility* Ability = Cast<USSGameplayAbility>(Spec.Ability);
+	AbilityHandlesMap.Add(Ability->AbilityID, Spec.Handle);
 }
 
 void ASSCharacterBase::InitializeAttributes()
@@ -492,24 +508,6 @@ float ASSCharacterBase::GetMaxStamina() const
 
 float ASSCharacterBase::GetMoveSpeed() const
 {
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		if (AttributeSet)
-		{
-			UE_LOG(LogGame, Display, TEXT("Server speed %f"), AttributeSet->GetMoveSpeed());
-		}
-	}
-	else
-	{
-		if (AttributeSet)
-		{
-			UE_LOG(LogGame, Display, TEXT("Client speed %f"), AttributeSet->GetMoveSpeed());
-		}
-		else
-		{
-			UE_LOG(LogGame, Display, TEXT("No AttributeSet!!! Client speed 0!!!"));
-		}
-	}
 	if (AttributeSet)
 	{
 		return AttributeSet->GetMoveSpeed();
@@ -540,6 +538,11 @@ bool ASSCharacterBase::IsUsingAbilityiesWithTags(FGameplayTagContainer GameplayT
 {
 	TArray<USSGameplayAbility*> ActiveAbilities;
 	GetActiveAbilitiesWithTags(GameplayTagContainer, ActiveAbilities);
+	for(auto ability : ActiveAbilities)
+	{
+		UE_LOG(LogGame, Display, TEXT("%s"), *ability->AbilityTags.ToStringSimple());
+	}
+	UE_LOG(LogGame, Display, TEXT("=========================="));
 	return ActiveAbilities.Num() > 0;
 }
 

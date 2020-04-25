@@ -45,8 +45,25 @@ void USSAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagCon
 	}
 }
 
+void USSAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	Super::OnRep_ActivateAbilities();
+
+	ClientSaveActivateAbilityHandles();
+}
+
+void USSAbilitySystemComponent::ClientSaveActivateAbilityHandles_Implementation()
+{
+	ASSCharacterBase* Owner = Cast<ASSCharacterBase>(GetOwner());
+	
+	for (FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	{
+		Owner->SaveActivateAbilityHandles(Spec);
+	}
+}
+
 USSAbilitySystemComponent* USSAbilitySystemComponent::GetAbilitySystemComponentFromActor(const AActor* Actor,
-	bool LookForComponent)
+                                                                                         bool LookForComponent)
 {
 	return Cast<USSAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));
 }
