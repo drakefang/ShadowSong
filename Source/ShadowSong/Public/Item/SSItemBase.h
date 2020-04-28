@@ -26,7 +26,7 @@ public:
 
     }
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
+    UPROPERTY(BlueprintReadOnly, Category = Item)
     FPrimaryAssetType ItemType;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
