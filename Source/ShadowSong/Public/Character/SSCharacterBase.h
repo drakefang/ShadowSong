@@ -51,6 +51,8 @@ protected:
 	uint32 bShowDebugTrace : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Look")
 	float LookRotRate;
+	UPROPERTY(Replicated)
+	FRotator ControlRotation;
 
 	UPROPERTY()
 	class USSAttributeSet* AttributeSet;

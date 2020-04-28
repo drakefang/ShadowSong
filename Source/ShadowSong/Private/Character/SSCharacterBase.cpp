@@ -71,6 +71,7 @@ ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitial
 	HasMovementInput = false;
 	RotationMode = ERotationMode::LookingDirection;
 	bShowDebugTrace = false;
+	ControlRotation = GetControlRotation();
 
 	AttributeSet = CreateDefaultSubobject<USSAttributeSet>(TEXT("AttributeSet"));
 	bAbilitiesInitialized = false;
@@ -141,10 +142,13 @@ void ASSCharacterBase::UpdateGroundedRotation()
 		{
 			case ERotationMode::LookingDirection:
 			{
-				FRotator NewRot = GetControlRotation();
-				NewRot.Roll = 0;
-				NewRot.Pitch = 0;
-				SmoothCharacterRotation(NewRot, 500.0f, 10.0f);
+				if (GetLocalRole() == ROLE_Authority)
+				{
+					ControlRotation = GetControlRotation();
+					ControlRotation.Roll = 0;
+					ControlRotation.Pitch = 0;
+				}
+				SmoothCharacterRotation(ControlRotation, 500.0f, 10.0f);
 				break;
 			}
 			case ERotationMode::VelocityDirection:
@@ -723,4 +727,5 @@ void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASSCharacterBase, CharacterLevel);
+	DOREPLIFETIME(ASSCharacterBase, ControlRotation);
 }
