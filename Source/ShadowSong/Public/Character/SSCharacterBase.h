@@ -189,7 +189,8 @@ public:
 	float GetMoveSpeedBase() const;
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation, Category = "Avatar")
-	void AttachWeapon(class USSWeaponItem* Weapon, FName socket = "None");
+	void AttachWeapon(class USSWeaponItem* Weapon);
+	void AttachWeaponInternal(class USSWeaponItem* Weapon) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	void GetActiveAbilitiesWithTags(FGameplayTagContainer GameplayTagContainer, TArray<class USSGameplayAbility*>& ActiveAbilities) const;

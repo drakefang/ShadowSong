@@ -13,6 +13,7 @@
 int32 USSHelper::startid = 1000;
 TSubclassOf<class UAnimInstance> USSHelper::AnimClass;
 TArray<FSkeletalPartRow> USSHelper::DefaultParts;
+TArray<FWeaponSocketRow> USSHelper::WeaponSockets;
 
 void USSHelper::LoadPartTable(TAssetPtr<UDataTable> TableAsset)
 {
@@ -29,6 +30,17 @@ void USSHelper::LoadPartTable(TAssetPtr<UDataTable> TableAsset)
 	}
 }
 
+void USSHelper::LoadWeaponSocketTable(TAssetPtr<UDataTable> TableAsset)
+{
+	DefaultParts.Empty();
+	UDataTable* Table = Cast<UDataTable>(UKismetSystemLibrary::LoadAsset_Blocking(TableAsset));
+	for (auto& it : Table->GetRowMap())
+	{
+		FWeaponSocketRow* Row = (FWeaponSocketRow*)(it.Value);
+		WeaponSockets.Add(*Row);
+	}
+}
+
 const TArray<FSkeletalPartRow>& USSHelper::GetDefaultParts()
 {
 	if (DefaultParts.Num() == 0)
@@ -37,6 +49,24 @@ const TArray<FSkeletalPartRow>& USSHelper::GetDefaultParts()
 		LoadPartTable(Ptr);
 	}
 	return DefaultParts;
+}
+
+FName USSHelper::GetWeaponSockets(EPartType WeaponType)
+{
+	if (WeaponSockets.Num() == 0)
+	{
+		static TAssetPtr<UDataTable> Ptr(FString("DataTable'/Game/Configs/WeaponSockets.WeaponSockets'"));
+		LoadWeaponSocketTable(Ptr);
+	}
+	for(int i = 0; i < WeaponSockets.Num(); i++)
+	{
+		const FWeaponSocketRow& Row = WeaponSockets[i];
+		if (Row.Part == WeaponType)
+		{
+			return Row.Socket;
+		}
+	}
+	return FName();
 }
 
 void USSHelper::LoadAnimClass(TSubclassOf<class UAnimInstance> animClass)

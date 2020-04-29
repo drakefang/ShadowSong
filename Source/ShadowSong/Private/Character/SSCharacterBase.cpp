@@ -526,6 +526,43 @@ float ASSCharacterBase::GetMoveSpeedBase() const
 	return 0.0f;
 }
 
+void ASSCharacterBase::AttachWeaponInternal(USSWeaponItem* Weapon) const
+{
+	ASSWeaponBase* WeaponActor = nullptr;
+	switch(Weapon->EquipPartType)
+	{
+	case EPartType::PT_RightWeapon:
+		WeaponActor = RightHandWeapon;
+		break;
+	case EPartType::PT_LeftWeapon:
+		WeaponActor = LeftHandWeapon;
+		break;
+	case EPartType::PT_Shield:
+		WeaponActor = Shield;
+		break;
+	case EPartType::PT_Backpack:
+		WeaponActor = Backpack;
+		break;
+	default:
+		UE_LOG(LogGame, Display, TEXT("weapon part isn't valid!%s"), *UEnum::GetValueAsString<EPartType>(Weapon->EquipPartType));
+		return;
+	}
+
+	if (IsValid(WeaponActor))
+	{
+		FDetachmentTransformRules Rules(EDetachmentRule::KeepRelative,
+			EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, false);
+		WeaponActor->DetachFromActor(Rules);
+	}
+	else
+	{
+		WeaponActor = Cast<ASSWeaponBase>(GetWorld()->SpawnActor(Weapon->WeaponActor));
+	}
+	WeaponActor->AttachToComponent(GetMesh(),
+		FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true),
+		USSHelper::GetWeaponSockets(Weapon->EquipPartType));
+}
+
 void ASSCharacterBase::GetActiveAbilitiesWithTags(FGameplayTagContainer GameplayTagContainer,
 	TArray<USSGameplayAbility*>& ActiveAbilities) const
 {
@@ -547,26 +584,14 @@ bool ASSCharacterBase::IsUsingAbilityiesWithTags(FGameplayTagContainer GameplayT
 	return ActiveAbilities.Num() > 0;
 }
 
-bool ASSCharacterBase::AttachWeapon_Validate(class USSWeaponItem* Weapon, FName socket)
+bool ASSCharacterBase::AttachWeapon_Validate(class USSWeaponItem* Weapon)
 {
 	return true;
 }
 
-void ASSCharacterBase::AttachWeapon_Implementation(class USSWeaponItem* Weapon, FName SocketName)
+void ASSCharacterBase::AttachWeapon_Implementation(class USSWeaponItem* Weapon)
 {
-	if (IsValid(RightHandWeapon))
-	{
-		FDetachmentTransformRules Rules(EDetachmentRule::KeepRelative,
-			EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, false);
-		RightHandWeapon->DetachFromActor(Rules);
-	}
-	else
-	{
-		RightHandWeapon = Cast<ASSWeaponBase>(GetWorld()->SpawnActor(Weapon->WeaponActor));
-	}
-	RightHandWeapon->AttachToComponent(GetMesh(), 
-		FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true),
-		SocketName);
+	AttachWeaponInternal(Weapon);
 }
 
 void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color) const

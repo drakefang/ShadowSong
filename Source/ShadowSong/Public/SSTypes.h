@@ -70,6 +70,17 @@ struct FSkeletalPartRow : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
+struct FWeaponSocketRow : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EPartType Part;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName Socket;
+};
+
+USTRUCT(BlueprintType)
 struct SHADOWSONG_API FItemData
 {
 	GENERATED_BODY()
