@@ -13,3 +13,5 @@ Saved
 *.xcodeproj
 *.xcworkspace
 enc_temp_folder
+.idea
+Plugins/Developer
