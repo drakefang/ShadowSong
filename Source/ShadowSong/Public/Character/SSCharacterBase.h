@@ -69,8 +69,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Avatar")
 	TSubclassOf<class UAnimInstance> AnimClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Avatar")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	class ASSWeaponBase* RightHandWeapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	class ASSWeaponBase* LeftHandWeapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	class ASSWeaponBase* Shield;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	class ASSWeaponBase* Backpack;
+	
 	FGameplayTag DeadTag;
 
 public:

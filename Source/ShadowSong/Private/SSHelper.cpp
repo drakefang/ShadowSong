@@ -11,32 +11,32 @@
 #include "Animation/AnimInstance.h"
 
 int32 USSHelper::startid = 1000;
-TArray<FMeshPartRow> USSHelper::PartConfigs;
 TSubclassOf<class UAnimInstance> USSHelper::AnimClass;
+TArray<FSkeletalPartRow> USSHelper::DefaultParts;
 
 void USSHelper::LoadPartTable(TAssetPtr<UDataTable> TableAsset)
 {
-	PartConfigs.Empty();
+	DefaultParts.Empty();
 	UDataTable* Table = Cast<UDataTable>(UKismetSystemLibrary::LoadAsset_Blocking(TableAsset));
 	for (auto& it : Table->GetRowMap())
 	{
-		FMeshPartRow* Row = (FMeshPartRow*)(it.Value);
+		FSkeletalPartRow* Row = (FSkeletalPartRow*)(it.Value);
 		if (Row->DefaultMesh.IsNull())
 		{
 			UKismetSystemLibrary::LoadAsset_Blocking(Row->DefaultMesh);
 		}
-		PartConfigs.Add(*Row);
+		DefaultParts.Add(*Row);
 	}
 }
 
-const TArray<FMeshPartRow>& USSHelper::GetPartConfigs()
+const TArray<FSkeletalPartRow>& USSHelper::GetDefaultParts()
 {
-	if (PartConfigs.Num() == 0)
+	if (DefaultParts.Num() == 0)
 	{
-		static TAssetPtr<UDataTable> Ptr(FString("DataTable'/Game/Configs/CharacterPartConfig.CharacterPartConfig'"));
+		static TAssetPtr<UDataTable> Ptr(FString("DataTable'/Game/Configs/DefaultParts.DefaultParts'"));
 		LoadPartTable(Ptr);
 	}
-	return PartConfigs;
+	return DefaultParts;
 }
 
 void USSHelper::LoadAnimClass(TSubclassOf<class UAnimInstance> animClass)

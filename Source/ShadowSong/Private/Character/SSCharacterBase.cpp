@@ -32,39 +32,30 @@ ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitial
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Parts.Empty();
-	TArray<FMeshPartRow> parts = USSHelper::GetPartConfigs();
-	for (const auto& row : parts)
+	TArray<FSkeletalPartRow> DefaultParts = USSHelper::GetDefaultParts();
+	for (const auto& row : DefaultParts)
 	{
-		UStreamableRenderAsset* Asset = row.DefaultMesh.Get();
+		USkeletalMesh* Asset = row.DefaultMesh.Get();
 		if (!row.DefaultMesh.IsValid())
 		{
 			Asset = row.DefaultMesh.LoadSynchronous();
 		}
-		if (row.Socket == "None")
+		FName Name = *(UEnum::GetDisplayValueAsText<EPartType>(row.Part)).ToString();
+		USkeletalMeshComponent* Comp = GetMesh();
+		if (row.Part != EPartType::PT_Cloth)
 		{
-			USkeletalMeshComponent* Comp = GetMesh();
-			if (row.Name != "Cloth")
-			{
-				Comp = CreateMeshPart<USkeletalMeshComponent>(row.Name);
-				Comp->SetMasterPoseComponent(GetMesh());
-			}
-			else
-			{
-				Parts.Add(FMeshPart{ Comp, row.Name, row.Socket });
-			}
-			USkeletalMesh* DefaultMesh = Cast<USkeletalMesh>(Asset);
-			Comp->SetSkeletalMesh(DefaultMesh);
-			Comp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-			Comp->SetAnimClass(USSHelper::GetAnimClass());
-			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			Comp = CreateMeshPart<USkeletalMeshComponent>(Name);
+			Comp->SetMasterPoseComponent(GetMesh());
 		}
 		else
 		{
-			auto Comp = CreateMeshPart<UStaticMeshComponent>(row.Name, row.Socket);
-			UStaticMesh* DefaultMesh = Cast<UStaticMesh>(Asset);
-			Comp->SetStaticMesh(DefaultMesh);
-			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			Parts.Add(FMeshPart{ Comp, Name });
 		}
+		USkeletalMesh* DefaultMesh = Cast<USkeletalMesh>(Asset);
+		Comp->SetSkeletalMesh(DefaultMesh);
+		Comp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		//Comp->SetAnimClass(USSHelper::GetAnimClass());
+		Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	IsMoving = false;
@@ -84,6 +75,11 @@ void ASSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (AnimClass == nullptr)
+	{
+		AnimClass = USSHelper::GetAnimClass();
+	}
+
 	for (EPartType Pt = EPartType::PT_Cloth; Pt < EPartType::PT_Backpack;)
 	{
 		SelectedPart.Add(Pt, TEXT("NONE"));
@@ -96,9 +92,10 @@ void ASSCharacterBase::BeginPlay()
 	this->GetMesh()->GetChildrenComponents(false, children);
 	for (int i = 0; i < children.Num(); i++)
 	{
-		UMeshComponent* child = Cast<UMeshComponent>(children[i]);
+		USkeletalMeshComponent* child = Cast<USkeletalMeshComponent>(children[i]);
 		FString str;
 		child->GetName(str);
+		child->SetAnimClass(AnimClass);
 		Parts.Add(FMeshPart{ child, *str, "None" });
 	}
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 #include "Engine/DataTable.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/StreamableRenderAsset.h"
 #include "SSTypes.generated.h"
 
@@ -58,16 +59,14 @@ struct FMeshPart
 };
 
 USTRUCT(BlueprintType)
-struct FMeshPartRow : public FTableRowBase
+struct FSkeletalPartRow : public FTableRowBase
 {
 	GENERATED_BODY()
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName Name;
+	EPartType Part;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName Socket = "None";
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TAssetPtr<UStreamableRenderAsset> DefaultMesh;
+	TAssetPtr<USkeletalMesh> DefaultMesh;
 };
 
 USTRUCT(BlueprintType)
