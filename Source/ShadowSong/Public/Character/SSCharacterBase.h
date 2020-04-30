@@ -60,6 +60,9 @@ protected:
 	UPROPERTY()
 	uint32 bAbilitiesInitialized : 1;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "Anim")
+	EWeaponAnimType WeaponAnimType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BaseParts")
 	TArray<FMeshPart> Parts;
 

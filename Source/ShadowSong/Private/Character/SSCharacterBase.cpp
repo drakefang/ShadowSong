@@ -750,4 +750,5 @@ void ASSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(ASSCharacterBase, CharacterLevel);
 	DOREPLIFETIME(ASSCharacterBase, ControlRotation);
+	DOREPLIFETIME(ASSCharacterBase, WeaponAnimType);
 }

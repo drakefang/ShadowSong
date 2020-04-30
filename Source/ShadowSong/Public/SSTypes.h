@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+// ReSharper disable All
 #pragma once
 
 #include "CoreMinimal.h"
@@ -25,6 +26,17 @@ enum class EPartType : uint8
 	PT_LeftWeapon	UMETA(DisplayName = "LeftWeapon"),
 	PT_RightWeapon	UMETA(DisplayName = "RightWeapon"),
 	PT_Backpack		UMETA(DisplayName = "Backpack"),
+};
+
+UENUM(BlueprintType)
+enum class EWeaponAnimType : uint8
+{
+	WAT_NoWeapon			UMETA(DisplayName = "NoWeapon"),
+	WAT_Bow					UMETA(DisplayName = "Bow"),
+	WAT_DoubleSword			UMETA(DisplayName = "DoubleSword"),
+	WAT_MagicWand			UMETA(DisplayName = "MagicWand"),
+	WAT_SwordShield			UMETA(DisplayName = "SwordShield"),
+	WAT_TwoHandSword		UMETA(DisplayName = "TwoHandSword"),
 };
 
 UENUM(BlueprintType)
