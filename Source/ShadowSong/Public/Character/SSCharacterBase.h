@@ -51,7 +51,7 @@ protected:
 	uint32 bShowDebugTrace : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Look")
 	float LookRotRate;
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	FRotator ControlRotation;
 
 	UPROPERTY()
