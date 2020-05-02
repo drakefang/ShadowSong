@@ -3,7 +3,6 @@
 
 #include "SSCharacterBase.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -40,7 +39,7 @@ ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitial
 		{
 			Asset = row.DefaultMesh.LoadSynchronous();
 		}
-		FName Name = *(UEnum::GetDisplayValueAsText<EPartType>(row.Part)).ToString();
+		const FName Name = *(UEnum::GetDisplayValueAsText<EPartType>(row.Part)).ToString();
 		USkeletalMeshComponent* Comp = GetMesh();
 		if (row.Part != EPartType::PT_Cloth)
 		{
@@ -106,11 +105,11 @@ void ASSCharacterBase::BeginPlay()
 
 void ASSCharacterBase::SetEssentialValues()
 {
-	FVector Velocity = GetVelocity();
-	FVector delta = Velocity - PreviousVelocity;
+	const FVector Velocity = GetVelocity();
+	const FVector delta = Velocity - PreviousVelocity;
 	Acceleration = delta / GetWorld()->GetDeltaSeconds();
-	
-	FVector tmp = FVector(Velocity.X, Velocity.Y, 0);
+
+	const FVector tmp = FVector(Velocity.X, Velocity.Y, 0);
 	Speed = UKismetMathLibrary::VSize(tmp);
 	IsMoving = Speed > 1.0f;
 
@@ -120,8 +119,8 @@ void ASSCharacterBase::SetEssentialValues()
 	}
 
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
-	FVector ca = Movement->GetCurrentAcceleration();
-	float ma = Movement->GetMaxAcceleration();
+	const FVector ca = Movement->GetCurrentAcceleration();
+	const float ma = Movement->GetMaxAcceleration();
 	MovementInputAmount = UKismetMathLibrary::VSize(ca) / ma;
 	HasMovementInput = MovementInputAmount > 0;
 
@@ -150,7 +149,7 @@ void ASSCharacterBase::UpdateGroundedRotation()
 			}
 			case ERotationMode::VelocityDirection:
 			{
-				FRotator Target = UKismetMathLibrary::MakeRotator(0, 0, LastVelocityRotation.Yaw);
+				const FRotator Target = UKismetMathLibrary::MakeRotator(0, 0, LastVelocityRotation.Yaw);
 				SmoothCharacterRotation(Target, 800.0f, 10.0f);
 				break;
 			}
@@ -184,12 +183,12 @@ bool ASSCharacterBase::CanUpdateMovingRotation() const
 void ASSCharacterBase::SmoothCharacterRotation(const FRotator& Target, float TargetInterpSpeed, 
 	float ActorInterpSpeed)
 {
-	float DeltaTime = GetWorld()->GetDeltaSeconds();
+	const float DeltaTime = GetWorld()->GetDeltaSeconds();
 	TargetRotation = UKismetMathLibrary::RInterpTo_Constant(TargetRotation, Target, 
 		DeltaTime, TargetInterpSpeed);
-	
-	FRotator NewRot = UKismetMathLibrary::RInterpTo(GetActorRotation(), TargetRotation, 
-		DeltaTime, ActorInterpSpeed);
+
+	const FRotator NewRot = UKismetMathLibrary::RInterpTo(GetActorRotation(), TargetRotation, 
+	                                                      DeltaTime, ActorInterpSpeed);
 	SetActorRotation(NewRot);
 }
 
@@ -355,7 +354,7 @@ void ASSCharacterBase::InitializeAttributes()
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, GetCharacterLevel(), EffectContext);
+	const FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, GetCharacterLevel(), EffectContext);
 	if (NewHandle.IsValid())
 	{
 		/*FActiveGameplayEffectHandle ActiveHandle = */AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
@@ -372,7 +371,7 @@ void ASSCharacterBase::AddStartupEffects()
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	for(auto Effect : StartupEffects)
+	for(const auto Effect : StartupEffects)
 	{
 		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, GetCharacterLevel(), EffectContext);
 		if (NewHandle.IsValid())
@@ -387,8 +386,8 @@ void ASSCharacterBase::MovementInput(bool IsForward)
 	FVector Forward, Right;
 	float XOut = 0, YOut = 0;
 	GetControlForwardRightVector(Forward, Right);
-	float YIn = GetInputAxisValue("MoveForward/Backwards");
-	float XIn = GetInputAxisValue("MoveRight/Left");
+	const float YIn = GetInputAxisValue("MoveForward/Backwards");
+	const float XIn = GetInputAxisValue("MoveRight/Left");
 	FixDiagonalGamePadValues(XIn, YIn, XOut, YOut);
 	if (IsForward)
 	{
@@ -402,7 +401,7 @@ void ASSCharacterBase::MovementInput(bool IsForward)
 
 void ASSCharacterBase::CameraControlInput(float AxisValue, bool IsPitch)
 {
-	float v = AxisValue * LookRotRate;
+	const float v = AxisValue * LookRotRate;
 	if (IsPitch)
 	{
 		AddControllerPitchInput(v);
@@ -526,9 +525,9 @@ float ASSCharacterBase::GetMoveSpeedBase() const
 	return 0.0f;
 }
 
-void ASSCharacterBase::AttachWeaponInternal(USSWeaponItem* Weapon) const
+void ASSCharacterBase::AttachWeaponInternal(USSWeaponItem* Weapon)
 {
-	ASSWeaponBase* WeaponActor = nullptr;
+	ASSWeaponBase* WeaponActor;
 	switch(Weapon->EquipPartType)
 	{
 	case EPartType::PT_RightWeapon:
@@ -550,8 +549,8 @@ void ASSCharacterBase::AttachWeaponInternal(USSWeaponItem* Weapon) const
 
 	if (IsValid(WeaponActor))
 	{
-		FDetachmentTransformRules Rules(EDetachmentRule::KeepRelative,
-			EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, false);
+		const FDetachmentTransformRules Rules(EDetachmentRule::KeepRelative,
+		                                      EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, false);
 		WeaponActor->DetachFromActor(Rules);
 	}
 	else
@@ -561,6 +560,8 @@ void ASSCharacterBase::AttachWeaponInternal(USSWeaponItem* Weapon) const
 	WeaponActor->AttachToComponent(GetMesh(),
 		FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true),
 		USSHelper::GetWeaponSockets(Weapon->EquipPartType));
+
+	WeaponAnimType = Weapon->WeaponAnimType;
 }
 
 void ASSCharacterBase::GetActiveAbilitiesWithTags(FGameplayTagContainer GameplayTagContainer,
@@ -596,12 +597,12 @@ void ASSCharacterBase::AttachWeapon_Implementation(class USSWeaponItem* Weapon)
 
 void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color) const
 {
-	FVector Location = GetActorLocation();
-	FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	FVector LineStart = Location - Offset;
+	const FVector Location = GetActorLocation();
+	const FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	const FVector LineStart = Location - Offset;
 
 	FVector LineEnd = UKismetMathLibrary::Conv_RotatorToVector(LastVelocityRotation);
-	FVector V = GetVelocity();
+	const FVector V = GetVelocity();
 	if (!UKismetMathLibrary::EqualEqual_VectorVector(V, FVector::ZeroVector))
 	{
 		LineEnd = V;
@@ -611,8 +612,8 @@ void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color) const
 		Color = Color * 0.25f;
 	}
 	LineEnd = UKismetMathLibrary::Vector_NormalUnsafe(LineEnd);
-	float Len = UKismetMathLibrary::MapRangeClamped(UKismetMathLibrary::VSize(V), 
-		0, GetCharacterMovement()->MaxWalkSpeed, 50.0f, 75.0f);
+	const float Len = UKismetMathLibrary::MapRangeClamped(UKismetMathLibrary::VSize(V), 
+	                                                      0, GetCharacterMovement()->MaxWalkSpeed, 50.0f, 75.0f);
 	LineEnd *= Len;
 	LineEnd += LineStart;
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 60.0f, Color, 0, 5.0f);
@@ -620,12 +621,12 @@ void ASSCharacterBase::DrawRealtimeVelocityArrow(FLinearColor Color) const
 
 void ASSCharacterBase::DrawRealtimeAccelerateArrow(FLinearColor Color) const
 {
-	FVector Location = GetActorLocation();
-	FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 3.5f);
-	FVector LineStart = Location - Offset;
+	const FVector Location = GetActorLocation();
+	const FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 3.5f);
+	const FVector LineStart = Location - Offset;
 
 	FVector LineEnd = UKismetMathLibrary::Conv_RotatorToVector(LastMovementInputRotation);
-	FVector Acc = GetCharacterMovement()->GetCurrentAcceleration();
+	const FVector Acc = GetCharacterMovement()->GetCurrentAcceleration();
 	if (!UKismetMathLibrary::EqualEqual_VectorVector(Acc, FVector::ZeroVector))
 	{
 		LineEnd = Acc;
@@ -643,11 +644,11 @@ void ASSCharacterBase::DrawRealtimeAccelerateArrow(FLinearColor Color) const
 	UKismetSystemLibrary::DrawDebugArrow(GetWorld(), LineStart, LineEnd, 50.0f, Color, 0, 3);
 }
 
-void ASSCharacterBase::DrawRealtimeCharacterRotArrow(FLinearColor Color) const
+void ASSCharacterBase::DrawRealtimeCharacterRotArrow(const FLinearColor Color) const
 {
-	FVector Location = GetActorLocation();
-	FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 7);
-	FVector LineStart = Location - Offset;
+	const FVector Location = GetActorLocation();
+	const FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - 7);
+	const FVector LineStart = Location - Offset;
 
 	FVector LineEnd = UKismetMathLibrary::Conv_RotatorToVector(TargetRotation);
 	LineEnd = UKismetMathLibrary::Vector_NormalUnsafe(LineEnd) * 50 + LineStart;
@@ -656,9 +657,9 @@ void ASSCharacterBase::DrawRealtimeCharacterRotArrow(FLinearColor Color) const
 
 void ASSCharacterBase::DrawRealtimeControllerRotArrow(FLinearColor Color) const
 {
-	FVector Location = GetActorLocation();
-	FVector Offset = FVector(0, 0, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	FVector LineStart = Location - Offset;
+	const FVector Location = GetActorLocation();
+	const FVector Offset = FVector(0, 0, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	const FVector LineStart = Location - Offset;
 
 	FRotator rot = GetControlRotation();
 	rot.Pitch = 0;
@@ -670,8 +671,8 @@ void ASSCharacterBase::DrawRealtimeControllerRotArrow(FLinearColor Color) const
 
 void ASSCharacterBase::FixDiagonalGamePadValues(float XIn, float YIn, float& XOut, float& YOut)
 {
-	float ax = UKismetMathLibrary::Abs(XIn);
-	float ay = UKismetMathLibrary::Abs(YIn);
+	const float ax = UKismetMathLibrary::Abs(XIn);
+	const float ay = UKismetMathLibrary::Abs(YIn);
 	YOut = UKismetMathLibrary::MapRangeClamped(ax, 0, 0.6f, 1.0f, 1.2f) * YIn;
 	YOut = UKismetMathLibrary::FClamp(YOut, -1, 1);
 
@@ -681,7 +682,7 @@ void ASSCharacterBase::FixDiagonalGamePadValues(float XIn, float YIn, float& XOu
 
 void ASSCharacterBase::GetControlForwardRightVector(FVector& Forward, FVector& Right) const
 {
-	FRotator rot = this->GetControlRotation();
+	const FRotator rot = this->GetControlRotation();
 	Forward = UKismetMathLibrary::GetForwardVector(FRotator(0, rot.Yaw, 0));
 	Right = UKismetMathLibrary::GetRightVector(FRotator(0, rot.Yaw, 0));
 }

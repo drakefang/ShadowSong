@@ -24,4 +24,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Part")
 	EPartType EquipPartType;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Part")
+	EWeaponAnimType WeaponAnimType;
 };
