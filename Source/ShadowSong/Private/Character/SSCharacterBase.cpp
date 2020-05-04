@@ -561,6 +561,24 @@ void ASSCharacterBase::AttachWeaponInternal(USSWeaponItem* Weapon)
 		FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true),
 		USSHelper::GetWeaponSockets(Weapon->EquipPartType));
 
+	switch (Weapon->EquipPartType)
+	{
+	case EPartType::PT_RightWeapon:
+		RightHandWeapon = WeaponActor;
+		break;
+	case EPartType::PT_LeftWeapon:
+		LeftHandWeapon = WeaponActor;
+		break;
+	case EPartType::PT_Shield:
+		Shield = WeaponActor;
+		break;
+	case EPartType::PT_Backpack:
+		Backpack = WeaponActor;
+		break;
+	default:
+		return;
+	}
+
 	WeaponAnimType = Weapon->WeaponAnimType;
 }
 
