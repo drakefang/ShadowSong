@@ -13,6 +13,8 @@
 
 class UAbilitySystemComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterBaseHitReactDelegate, EHitReaction, Reaction);
+
 UCLASS()
 class SHADOWSONG_API ASSCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -84,11 +86,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	class ASSWeaponBase* Backpack;
 	
+	UPROPERTY(BlueprintAssignable, Category = "Hitted")
+	FCharacterBaseHitReactDelegate ShowHitReact;
+	
 	FGameplayTag DeadTag;
 
 public:
 	// Sets default values for this character's properties
 	ASSCharacterBase(const class FObjectInitializer& ObjectInitializer);
+
+	static const FGameplayTag NormalHitType;
+	static const FGameplayTag DefendHitType;
 
 protected:
 	// Called when the game starts or when spawned
@@ -159,6 +167,11 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool ActivateAbility(ESSAbilityID ID, bool bAllowRemoteActivation = true);
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
+	virtual void PlayHitReact(FGameplayTag HitType, AActor* DamageCauser);
+	virtual void PlayHitReact_Implementation(FGameplayTag HitType, AActor* DamageCauser);
+	virtual bool PlayHitReact_Validate(FGameplayTag HitType, AActor* DamageCauser);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")

@@ -20,6 +20,9 @@
 #include "SSWeaponBase.h"
 #include "SSWeaponItem.h"
 
+const FGameplayTag ASSCharacterBase::NormalHitType = FGameplayTag::RequestGameplayTag(FName("Effect.HitReact.Normal"));
+const FGameplayTag ASSCharacterBase::DefendHitType = FGameplayTag::RequestGameplayTag(FName("Effect.HitReact.Defend"));
+
 // Sets default values
 ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<USSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName)),
@@ -435,6 +438,23 @@ bool ASSCharacterBase::ActivateAbility(ESSAbilityID ID, bool bAllowRemoteActivat
 	return false;
 }
 
+void ASSCharacterBase::PlayHitReact_Implementation(FGameplayTag HitType, AActor* DamageCauser)
+{
+	if (HitType == NormalHitType)
+	{
+		ShowHitReact.Broadcast(EHitReaction::HR_Get);
+	}
+	else if (HitType == DefendHitType)
+	{
+		ShowHitReact.Broadcast(EHitReaction::HR_Defend);
+	}
+}
+
+bool ASSCharacterBase::PlayHitReact_Validate(FGameplayTag HitType, AActor* DamageCauser)
+{
+	return true;
+}
+
 int32 ASSCharacterBase::GetCharacterLevel() const
 {
 	return CharacterLevel;
@@ -560,6 +580,7 @@ void ASSCharacterBase::AttachWeaponInternal(USSWeaponItem* Weapon)
 	WeaponActor->AttachToComponent(GetMesh(),
 		FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true),
 		USSHelper::GetWeaponSockets(Weapon->EquipPartType));
+	WeaponActor->SetInstigator(this);
 
 	switch (Weapon->EquipPartType)
 	{
@@ -599,7 +620,7 @@ bool ASSCharacterBase::IsUsingAbilityiesWithTags(FGameplayTagContainer GameplayT
 	{
 		UE_LOG(LogGame, Display, TEXT("%s"), *ability->AbilityTags.ToStringSimple());
 	}
-	UE_LOG(LogGame, Display, TEXT("=========================="));
+	//UE_LOG(LogGame, Display, TEXT("=========================="));
 	return ActiveAbilities.Num() > 0;
 }
 

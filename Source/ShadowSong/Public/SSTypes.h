@@ -40,6 +40,14 @@ enum class EWeaponAnimType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EHitReaction : uint8
+{
+	HR_NONE					UMETA(DisplayName = "None"),
+	HR_Get					UMETA(DisplayName = "Get"),
+	HR_Defend				UMETA(DisplayName = "Defend"),
+};
+
+UENUM(BlueprintType)
 enum class ERotationMode : uint8
 {
 	VelocityDirection,
