@@ -68,6 +68,7 @@ ASSCharacterBase::ASSCharacterBase(const class FObjectInitializer& ObjectInitial
 
 	AttributeSet = CreateDefaultSubobject<USSAttributeSet>(TEXT("AttributeSet"));
 	bAbilitiesInitialized = false;
+	bIsArming = false;
 
 	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
 }
@@ -95,6 +96,7 @@ void ASSCharacterBase::BeginPlay()
 	for (int i = 0; i < children.Num(); i++)
 	{
 		USkeletalMeshComponent* child = Cast<USkeletalMeshComponent>(children[i]);
+		if (child == nullptr) continue;
 		FString str;
 		child->GetName(str);
 		child->SetAnimClass(AnimClass);
