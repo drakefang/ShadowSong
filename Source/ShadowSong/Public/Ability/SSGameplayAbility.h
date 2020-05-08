@@ -9,16 +9,37 @@
 
 
 USTRUCT(BlueprintType)
-struct FSSGamePlayEffectContainer
+struct FSSGameplayEffectContainer
 {
 	GENERATED_BODY()
 
 public:
-	FSSGamePlayEffectContainer() {}
+	FSSGameplayEffectContainer() {}
 
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect Container")
 	TArray<TSubclassOf<UGameplayEffect>> GameplayEffects;
+};
+
+USTRUCT(BlueprintType)
+struct FSSGameplayEffectContainerSpec
+{
+	GENERATED_BODY()
+
+public:
+	FSSGameplayEffectContainerSpec() {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayEffectContainer)
+	FGameplayAbilityTargetDataHandle TargetData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayEffectContainer)
+	TArray<FGameplayEffectSpecHandle> TargetEffectSpecs;
+
+	bool HasValidEffects() const;
+
+	bool HasValidTargets() const;
+
+	void AddTargets(const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors);
 };
 
 /**
@@ -42,7 +63,19 @@ public:
 	bool bActivateAbilityOnGranted = false;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability")
-	TMap<FGameplayTag, FSSGamePlayEffectContainer> EffectMap;
+	TMap<FGameplayTag, FSSGameplayEffectContainer> EffectMap;
 
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+
+	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
+	virtual FSSGameplayEffectContainerSpec MakeEffectContainerSpecFromContainer(const FSSGameplayEffectContainer& ContainerSpec, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
+
+	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
+	virtual FSSGameplayEffectContainerSpec MakeEffectContainerSpec(FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
+
+	UFUNCTION(BlueprintCallable, Category = Ability)
+	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainerSpec(const FSSGameplayEffectContainerSpec& ContainerSpec);
+
+	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
+	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainer(FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
 };
