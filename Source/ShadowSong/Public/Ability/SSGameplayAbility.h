@@ -7,6 +7,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "SSGameplayAbility.generated.h"
 
+class USSTargetType;
 
 USTRUCT(BlueprintType)
 struct FSSGameplayEffectContainer
@@ -16,6 +17,8 @@ struct FSSGameplayEffectContainer
 public:
 	FSSGameplayEffectContainer() {}
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect Container")
+	TSubclassOf<USSTargetType> TargetType;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Effect Container")
 	TArray<TSubclassOf<UGameplayEffect>> GameplayEffects;
@@ -68,14 +71,17 @@ public:
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
-	virtual FSSGameplayEffectContainerSpec MakeEffectContainerSpecFromContainer(const FSSGameplayEffectContainer& ContainerSpec, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
+	virtual FSSGameplayEffectContainerSpec MakeEffectContainerSpecFromContainer(const FSSGameplayEffectContainer& Container, 
+		const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
 
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
-	virtual FSSGameplayEffectContainerSpec MakeEffectContainerSpec(FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
+	virtual FSSGameplayEffectContainerSpec MakeEffectContainerSpec(FGameplayTag ContainerTag, 
+		const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
 
 	UFUNCTION(BlueprintCallable, Category = Ability)
 	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainerSpec(const FSSGameplayEffectContainerSpec& ContainerSpec);
 
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
-	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainer(FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
+	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainer(FGameplayTag ContainerTag, 
+		const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
 };

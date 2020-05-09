@@ -38,7 +38,7 @@ void USSAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	Super::PostGameplayEffectExecute(Data);
 
 	FString cs = Data.EffectSpec.GetContext().ToString();
-	UE_LOG(LogGame, Display, TEXT("%s:%s"), __FUNCTION__, *cs);
+	UE_LOG(LogGame, Display, TEXT("%s:%s"), TEXT(__FUNCTION__), *cs);
 }
 
 void USSAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

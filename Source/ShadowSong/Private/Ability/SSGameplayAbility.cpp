@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "SSAbilitySystemComponent.h"
 #include "SSCharacterBase.h"
+#include "SSTargetType.h"
 
 bool FSSGameplayEffectContainerSpec::HasValidEffects() const
 {
@@ -60,7 +61,24 @@ FSSGameplayEffectContainerSpec USSGameplayAbility::MakeEffectContainerSpecFromCo
 	USSAbilitySystemComponent* OwningASC = USSAbilitySystemComponent::GetAbilitySystemComponentFromActor(OwningActor);
 	if (OwningASC)
 	{
-		//TODO
+		if (Container.TargetType.Get())
+		{
+			TArray<FHitResult> HitResults;
+			TArray<AActor*> TargetActors;
+			const USSTargetType* TargetTypeCDO = Container.TargetType.GetDefaultObject();
+			AActor* AvatarActor = GetAvatarActorFromActorInfo();
+			TargetTypeCDO->GetTargets(OwningCharacter, AvatarActor, EventData, HitResults, TargetActors);
+			ReturnSpec.AddTargets(HitResults, TargetActors);
+		}
+		if (OverrideGameplayLevel == INDEX_NONE)
+		{
+			OverrideGameplayLevel = this->GetAbilityLevel();
+		}
+
+		for(const auto& EffectClass : Container.GameplayEffects)
+		{
+			ReturnSpec.TargetEffectSpecs.Add(MakeOutgoingGameplayEffectSpec(EffectClass, OverrideGameplayLevel));
+		}
 	}
 
 	return ReturnSpec;
