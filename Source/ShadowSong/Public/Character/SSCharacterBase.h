@@ -158,6 +158,12 @@ public:
 
 	void SaveActivateAbilityHandles(const FGameplayAbilitySpec& Spec);
 
+	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags,
+		ASSCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Movement Input")
 	void MovementInput(bool IsForward);
@@ -174,6 +180,19 @@ protected:
 	virtual void PlayHitReact(FGameplayTag HitType, AActor* DamageCauser);
 	virtual void PlayHitReact_Implementation(FGameplayTag HitType, AActor* DamageCauser);
 	virtual bool PlayHitReact_Validate(FGameplayTag HitType, AActor* DamageCauser);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDamaged(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags,
+		ASSCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")

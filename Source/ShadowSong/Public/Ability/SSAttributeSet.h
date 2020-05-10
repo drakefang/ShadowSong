@@ -7,6 +7,15 @@
 #include "AbilitySystemComponent.h"
 #include "SSAttributeSet.generated.h"
 
+class USSAttributeSet;
+class PostEffectExecutor
+{
+public:
+	virtual ~PostEffectExecutor() {}
+
+	virtual void Executor(UAbilitySystemComponent* Source, const FGameplayTagContainer& SourceTags,
+		const FGameplayEffectModCallbackData& Data, USSAttributeSet* Set) {};
+};
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
@@ -21,6 +30,7 @@ class SHADOWSONG_API USSAttributeSet : public UAttributeSet
 	
 public:
 	USSAttributeSet();
+	~USSAttributeSet();
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
@@ -70,7 +80,13 @@ public:
 	FGameplayAttributeData Level;
 	ATTRIBUTE_ACCESSORS(USSAttributeSet, Level);
 
+	TMap<FGameplayAttribute, PostEffectExecutor> AttributeExecutors;
+
 protected:
+	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, 
+		const FGameplayAttributeData& MaxAttribute, float NewMaxValue, 
+		const FGameplayAttribute& AffectedAttributeProperty) const;
+	
 	UFUNCTION()
 	virtual void OnRep_Health();
 

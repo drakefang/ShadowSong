@@ -344,6 +344,37 @@ void ASSCharacterBase::SaveActivateAbilityHandles(const FGameplayAbilitySpec& Sp
 	AbilityHandlesMap.Add(Ability->AbilityID, Spec.Handle);
 }
 
+void ASSCharacterBase::HandleDamage(float DamageAmount, const FHitResult& HitInfo,
+	const FGameplayTagContainer& DamageTags, ASSCharacterBase* InstigatorCharacter, AActor* DamageCauser)
+{
+	this->OnDamaged(DamageAmount, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+}
+
+void ASSCharacterBase::HandleHealthChanged(float DeltaValue, const FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+	{
+		this->OnHealthChanged(DeltaValue, EventTags);
+	}
+}
+
+void ASSCharacterBase::HandleManaChanged(float DeltaValue, const FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+	{
+		this->OnManaChanged(DeltaValue, EventTags);
+	}
+}
+
+void ASSCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGameplayTagContainer& EventTags)
+{
+	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
+	if (bAbilitiesInitialized)
+	{
+		this->OnMoveSpeedChanged(DeltaValue, EventTags);
+	}
+}
+
 void ASSCharacterBase::InitializeAttributes()
 {
 	if (!AbilitySystemComponent)
