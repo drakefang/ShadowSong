@@ -166,14 +166,18 @@ USSAttributeSet::USSAttributeSet()
 	, DefensePower(1.f)
 	, Level(1)
 {
-	AttributeExecutors.Add(GetDamageAttribute(), DamagePostExecutor());
-	AttributeExecutors.Add(GetManaAttribute(), ManaPostExecutor());
-	AttributeExecutors.Add(GetHealthAttribute(), HealthPostExecutor());
-	AttributeExecutors.Add(GetMoveSpeedAttribute(), MoveSpeedPostExecutor());
+	AttributeExecutors.Add(GetDamageAttribute(), new DamagePostExecutor());
+	AttributeExecutors.Add(GetManaAttribute(), new ManaPostExecutor());
+	AttributeExecutors.Add(GetHealthAttribute(), new HealthPostExecutor());
+	AttributeExecutors.Add(GetMoveSpeedAttribute(), new MoveSpeedPostExecutor());
 }
 
 USSAttributeSet::~USSAttributeSet()
 {
+	for(const auto& kv : AttributeExecutors)
+	{
+		delete kv.Value;
+	}
 }
 
 void USSAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -201,10 +205,10 @@ void USSAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
 	const FGameplayTagContainer SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
 
-	PostEffectExecutor* Executor = AttributeExecutors.Find(Data.EvaluatedData.Attribute);
-	if (Executor)
+	PostEffectExecutor** ExecutorPtr = AttributeExecutors.Find(Data.EvaluatedData.Attribute);
+	if (ExecutorPtr)
 	{
-		Executor->Executor(Source, SourceTags, Data, this);
+		(*ExecutorPtr)->Executor(Source, SourceTags, Data, this);
 	}
 }
 

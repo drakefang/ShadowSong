@@ -80,7 +80,7 @@ public:
 	FGameplayAttributeData Level;
 	ATTRIBUTE_ACCESSORS(USSAttributeSet, Level);
 
-	TMap<FGameplayAttribute, PostEffectExecutor> AttributeExecutors;
+	TMap<FGameplayAttribute, PostEffectExecutor*> AttributeExecutors;
 
 protected:
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, 
