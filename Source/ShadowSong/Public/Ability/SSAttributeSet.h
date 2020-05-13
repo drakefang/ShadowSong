@@ -88,32 +88,32 @@ protected:
 		const FGameplayAttribute& AffectedAttributeProperty) const;
 	
 	UFUNCTION()
-	virtual void OnRep_Health();
+	virtual void OnRep_Health(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_MaxHealth();
+	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_Mana();
+	virtual void OnRep_Mana(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_MaxMana();
+	virtual void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_MoveSpeed();
+	virtual void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_AttackPower();
+	virtual void OnRep_AttackPower(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_DefensePower();
+	virtual void OnRep_DefensePower(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_Stamina();
+	virtual void OnRep_Stamina(const FGameplayAttributeData& OldValue);
 	
 	UFUNCTION()
-	virtual void OnRep_MaxStamina();
+	virtual void OnRep_MaxStamina(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
-	virtual void OnRep_Level();
+	virtual void OnRep_Level(const FGameplayAttributeData& OldValue);
 };

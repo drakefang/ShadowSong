@@ -241,52 +241,52 @@ void USSAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& Affect
 	}
 }
 
-void USSAttributeSet::OnRep_Health()
+void USSAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Health);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Health, OldValue);
 }
 
-void USSAttributeSet::OnRep_MaxHealth()
+void USSAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxHealth, OldValue);
 }
 
-void USSAttributeSet::OnRep_Mana()
+void USSAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Mana);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Mana, OldValue);
 }
 
-void USSAttributeSet::OnRep_MaxMana()
+void USSAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxMana);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxMana, OldValue);
 }
 
-void USSAttributeSet::OnRep_MoveSpeed()
+void USSAttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MoveSpeed);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MoveSpeed, OldValue);
 }
 
-void USSAttributeSet::OnRep_AttackPower()
+void USSAttributeSet::OnRep_AttackPower(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, AttackPower);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, AttackPower, OldValue);
 }
 
-void USSAttributeSet::OnRep_DefensePower()
+void USSAttributeSet::OnRep_DefensePower(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, DefensePower);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, DefensePower, OldValue);
 }
 
-void USSAttributeSet::OnRep_Stamina()
+void USSAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Stamina);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Stamina, OldValue);
 }
 
-void USSAttributeSet::OnRep_MaxStamina()
+void USSAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxStamina);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, MaxStamina, OldValue);
 }
 
-void USSAttributeSet::OnRep_Level()
+void USSAttributeSet::OnRep_Level(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Level);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USSAttributeSet, Level, OldValue);
 }
